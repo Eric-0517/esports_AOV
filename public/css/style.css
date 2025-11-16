@@ -6,7 +6,7 @@ body {
   color:#fff; 
 }
 
-/* --- 頂部 Header --- */
+/* --- Header --- */
 .header { 
   display:flex; 
   justify-content:space-between; 
@@ -21,7 +21,6 @@ body {
   color:#2FD6FA; 
 }
 
-/* 右上角按鈕 */
 nav a.btn { 
   margin-left:12px; 
   background:#2FD6FA; 
@@ -37,7 +36,7 @@ nav a.btn {
   position:relative;
   width:100%;
   height:55vh;
-  background:url("../img/main.jpg") center/cover no-repeat; /* <== 主視覺圖片 */
+  background:url("../img/main.jpg") center/cover no-repeat;
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
@@ -62,7 +61,7 @@ nav a.btn {
   font-weight:600;
 }
 
-/* --- 新增：圖片下方的導覽列 --- */
+/* --- 導覽列 --- */
 .page-nav {
   display:flex;
   justify-content:space-around;
@@ -79,6 +78,7 @@ nav a.btn {
   text-decoration:none;
   padding:8px 16px;
   transition:0.25s;
+  cursor:pointer;
 }
 
 .page-nav a:hover {
@@ -86,19 +86,14 @@ nav a.btn {
   transform:scale(1.1);
 }
 
-/* --- 下方主要內容區 --- */
-.info-cards { 
-  display:grid; 
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); 
-  gap:20px; 
-  padding:30px; 
+/* --- SPA Pages --- */
+.page {
+  padding:30px;
 }
 
-.card { 
-  background:#111; 
-  padding:20px; 
-  border-radius:12px; 
-  box-shadow:0 4px 14px rgba(0,0,0,0.6); 
+.page h2 {
+  color:#2FD6FA;
+  margin-bottom:10px;
 }
 
 /* --- input 欄位 --- */
