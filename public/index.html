@@ -1,62 +1,36 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<title>AOV 線上賽</title>
-<link href="css/style.css" rel="stylesheet">
-<script src="js/main.js" defer></script>
-</head>
-
-<body>
-
-<header class="header">
-  <div class="brand">AOV 線上賽</div>
-  <nav>
-    <a class="btn">報名</a>
-    <a class="btn">後台</a>
-  </nav>
+<header class="main-banner">
+  <img src="images/main_visual.jpg" alt="主視覺圖" class="banner-img">
 </header>
 
-<!-- 主視覺 Banner -->
-<section class="banner">
-  <h1>歡迎來到 AOV 城市賽平台</h1>
-  <p>使用 Discord 登入報名參加賽事</p>
-  <button class="btn-banner">使用 Discord 登入</button>
-</section>
-
-<!-- 導覽列（使用 JS 切換頁面） -->
-<div class="page-nav">
-  <a data-page="intro">介紹</a>
-  <a data-page="rules">規則</a>
-  <a data-page="schedule">賽程</a>
-  <a data-page="register">報名</a>
-</div>
+<!-- 導覽列 -->
+<nav class="sub-nav">
+  <button onclick="showPage('intro')" class="sub-btn active">介紹</button>
+  <button onclick="showPage('rules')" class="sub-btn">規則</button>
+  <button onclick="showPage('schedule')" class="sub-btn">賽程</button>
+  <button onclick="showPage('register')" class="sub-btn">報名</button>
+</nav>
 
 <!-- 介紹頁 -->
-<section id="intro" class="page">
+<section id="intro" class="page-section">
   <h2>賽事介紹</h2>
-  <p>這裡是線上賽的活動介紹內容。</p>
+  <p>這裡是線上賽的介紹內容，可放活動說明、比賽亮點等。</p>
 </section>
 
 <!-- 規則頁 -->
-<section id="rules" class="page" style="display:none;">
+<section id="rules" class="page-section" style="display:none;">
   <h2>比賽規則</h2>
-  <p>這裡會放置完整的賽事規則。</p>
+  <p>這裡放置完整比賽規章、報名資格、處罰制度等。</p>
 </section>
 
 <!-- 賽程頁 -->
-<section id="schedule" class="page" style="display:none;">
+<section id="schedule" class="page-section" style="display:none;">
   <h2>賽程資訊</h2>
-  <p>賽程表將顯示在這裡。</p>
+  <p>這裡放置賽程表、對戰時段、公告資訊等。</p>
 </section>
 
 <!-- 報名頁 -->
-<section id="register" class="page" style="display:none;">
-  <h2>報名系統</h2>
-  <input class="input" placeholder="隊伍名稱">
-  <input class="input" placeholder="隊長 Discord ID">
-  <button class="btn-banner">提交報名</button>
+<section id="register" class="page-section" style="display:none;">
+  <h2>報名方式</h2>
+  <p>按下方按鈕進行 Discord 登入並報名。</p>
+  <button id="discord-login" class="reg-btn">使用 Discord 登入報名</button>
 </section>
-
-</body>
-</html>
