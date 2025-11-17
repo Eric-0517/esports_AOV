@@ -42,6 +42,44 @@
     <button class="modal-btn" id="modal-confirm">確認</button>
   </div>
 </div>
+<!-- 玩家個人資訊頁（切換用，同頁不跳轉） -->
+<section id="player-section" class="player-section" style="display:none;">
+
+  <!-- 導覽列右方：回首頁 + 登出 -->
+  <div class="player-nav">
+    <button class="btn-back" onclick="goEventHome()">回賽事首頁</button>
+    <button class="btn-logout" onclick="logout()">登出 / 更換帳號</button>
+  </div>
+
+  <h2 class="player-title">玩家個人資料</h2>
+
+  <!-- 玩家資料顯示區 -->
+  <div class="player-info-box">
+    <p><strong>Discord 帳號：</strong><span id="p-discord"></span></p>
+    <p><strong>遊戲暱稱：</strong><span id="p-nickname"></span></p>
+    <p><strong>遊戲排位：</strong><span id="p-rank"></span></p>
+    <p><strong>真實姓名：</strong><span id="p-realname"></span></p>
+    <p><strong>連絡電話：</strong><span id="p-phone"></span></p>
+    <p><strong>電子信箱：</strong><span id="p-email"></span></p>
+    <p><strong>生日：</strong><span id="p-birthday"></span></p>
+    <p><strong>是否居住在台灣：</strong><span id="p-taiwan"></span></p>
+    <p><strong>身分證字號：</strong><span id="p-id"></span></p>
+  </div>
+
+  <button class="btn-edit" onclick="editPlayer()">編輯個人資料</button>
+
+  <hr class="divide-line">
+
+  <!-- 已報名賽事 -->
+  <h3 class="player-subtitle">已報名賽事</h3>
+
+  <div id="joined-events" class="joined-events-list">
+    <!-- 由 JS 注入 -->
+  </div>
+
+  <p id="no-joined" class="no-joined hidden">尚無已報名賽事</p>
+
+</section>
 
 </body>
 </html>
