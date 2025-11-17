@@ -23,15 +23,68 @@
   </div>
 </nav>
 
-<!-- 最新賽事資訊 -->
-<section class="event-section">
+<!-- 賽事首頁 -->
+<section id="event-home" class="event-section page-section">
   <h2 class="event-title">最新賽事資訊</h2>
-
-  <div id="event-list" class="event-list">
-    <!-- JS 注入賽事卡片 -->
-  </div>
-
+  <div id="event-list" class="event-list"></div>
   <p id="no-event" class="no-event hidden">近期尚未舉辦任何賽事！</p>
+</section>
+
+<!-- 個人資料頁 -->
+<section id="profile-page" class="player-section page-section hidden">
+  <div class="player-nav">
+    <button class="btn-back" id="back-home">回賽事首頁</button>
+    <button class="btn-logout" id="logout-btn">登出</button>
+  </div>
+  <h2 class="player-title">個人資料</h2>
+  <div class="player-info-box">
+    <p>Discord 名稱：<span id="p-discord"></span></p>
+    <p>遊戲暱稱：<input type="text" id="p-nickname"></p>
+    <p>遊戲排位：<input type="text" id="p-rank"></p>
+    <p>真實姓名：<input type="text" id="p-realname"></p>
+    <p>連絡電話：<input type="text" id="p-phone"></p>
+    <p>電子信箱：<input type="email" id="p-email"></p>
+    <p>生日：<input type="date" id="p-birthday"></p>
+    <p>是否居住台灣：
+      <select id="p-taiwan">
+        <option value="是">是</option>
+        <option value="否">否</option>
+      </select>
+    </p>
+    <p>身分證字號：<input type="text" id="p-id"></p>
+  </div>
+  <div class="btn-row">
+    <button id="cancel-profile">取消</button>
+    <button id="save-profile">完成</button>
+  </div>
+  <div class="divide-line"></div>
+  <h3>已報名賽事</h3>
+  <div id="joined-events" class="joined-events-list"></div>
+  <p id="no-joined" class="no-event hidden">尚無已報名賽事</p>
+</section>
+
+<!-- 隊長報名頁 -->
+<section id="leader-page" class="player-section page-section hidden">
+  <div class="player-nav">
+    <button class="btn-back" id="back-home-leader">取消</button>
+  </div>
+  <h2 class="player-title">隊長報名</h2>
+  <p>隊長資訊由登入帳號自動帶入</p>
+  <div class="btn-row">
+    <button id="next-leader">下一步</button>
+  </div>
+</section>
+
+<!-- 隊員報名頁 -->
+<section id="member-page" class="player-section page-section hidden">
+  <div class="player-nav">
+    <button class="btn-back" id="back-home-member">取消</button>
+  </div>
+  <h2 class="player-title">隊員報名</h2>
+  <p>玩家序號由系統生成</p>
+  <div class="btn-row">
+    <button id="confirm-member">確認報名</button>
+  </div>
 </section>
 
 <!-- 系統通知 Modal -->
@@ -42,44 +95,6 @@
     <button class="modal-btn" id="modal-confirm">確認</button>
   </div>
 </div>
-<!-- 玩家個人資訊頁（切換用，同頁不跳轉） -->
-<section id="player-section" class="player-section" style="display:none;">
-
-  <!-- 導覽列右方：回首頁 + 登出 -->
-  <div class="player-nav">
-    <button class="btn-back" onclick="goEventHome()">回賽事首頁</button>
-    <button class="btn-logout" onclick="logout()">登出 / 更換帳號</button>
-  </div>
-
-  <h2 class="player-title">玩家個人資料</h2>
-
-  <!-- 玩家資料顯示區 -->
-  <div class="player-info-box">
-    <p><strong>Discord 帳號：</strong><span id="p-discord"></span></p>
-    <p><strong>遊戲暱稱：</strong><span id="p-nickname"></span></p>
-    <p><strong>遊戲排位：</strong><span id="p-rank"></span></p>
-    <p><strong>真實姓名：</strong><span id="p-realname"></span></p>
-    <p><strong>連絡電話：</strong><span id="p-phone"></span></p>
-    <p><strong>電子信箱：</strong><span id="p-email"></span></p>
-    <p><strong>生日：</strong><span id="p-birthday"></span></p>
-    <p><strong>是否居住在台灣：</strong><span id="p-taiwan"></span></p>
-    <p><strong>身分證字號：</strong><span id="p-id"></span></p>
-  </div>
-
-  <button class="btn-edit" onclick="editPlayer()">編輯個人資料</button>
-
-  <hr class="divide-line">
-
-  <!-- 已報名賽事 -->
-  <h3 class="player-subtitle">已報名賽事</h3>
-
-  <div id="joined-events" class="joined-events-list">
-    <!-- 由 JS 注入 -->
-  </div>
-
-  <p id="no-joined" class="no-joined hidden">尚無已報名賽事</p>
-
-</section>
 
 </body>
 </html>
