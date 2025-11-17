@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>AOV 賽事報名系統</title>
+<link rel="stylesheet" href="css/register-system.css">
+<script src="js/register-system.js" defer></script>
+</head>
+<body>
+
+<!-- 主視覺 -->
+<div class="main-visual">
+  <img src="images/main_visual.jpg" class="main-visual-img" alt="主視覺">
+</div>
+
+<!-- 導覽列 -->
+<nav class="nav-bar">
+  <div class="nav-left">
+    親愛的 <span id="username" class="username visitor">訪客</span> 你好
+  </div>
+  <div class="nav-right" id="nav-right">
+    <button class="btn-login" id="login-btn">Discord 登入</button>
+  </div>
+</nav>
+
+<!-- 最新賽事資訊 -->
+<section class="event-section">
+  <h2 class="event-title">最新賽事資訊</h2>
+
+  <div id="event-list" class="event-list">
+    <!-- JS 注入賽事卡片 -->
+  </div>
+
+  <p id="no-event" class="no-event hidden">近期尚未舉辦任何賽事！</p>
+</section>
+
+<!-- 系統通知 Modal -->
+<div id="system-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3 class="modal-title">系統通知</h3>
+    <p id="modal-text" class="modal-text">請先登入</p>
+    <button class="modal-btn" id="modal-confirm">確認</button>
+  </div>
+</div>
+
+</body>
+</html>
