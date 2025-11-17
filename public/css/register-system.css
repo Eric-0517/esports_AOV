@@ -1,0 +1,148 @@
+body {
+  background: #000;
+  color: #fff;
+  margin: 0;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+/* 主視覺 */
+.main-visual img {
+  width: 100%;
+  display: block;
+}
+
+/* 導覽列 */
+.nav-bar {
+  background: rgba(255,255,255,0.1);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.username {
+  color: #15C5FF;
+}
+
+.btn-login {
+  background: #FE2078;
+  color: #fff;
+  padding: 8px 16px;
+  border: 2px solid #FE2078;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.btn-login:hover {
+  opacity: 0.8;
+}
+
+/* 賽事卡片 */
+.event-section {
+  padding: 20px;
+}
+
+.event-title {
+  color: #2FD6FA;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.event-list {
+  display: grid;
+  gap: 20px;
+}
+
+.event-card {
+  background: #111;
+  border: 2px solid #2FD6FA;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.event-name {
+  font-size: 20px;
+  color: #fff;
+}
+
+.event-info {
+  margin: 8px 0;
+  color: #ccc;
+}
+
+.card-btn-row {
+  border-top: 1px solid #2FD6FA;
+  padding-top: 12px;
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+.card-btn {
+  flex: 1;
+  background: #2FD6FA;
+  padding: 10px;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card-btn:hover {
+  opacity: 0.8;
+}
+
+.no-event {
+  color: #fff;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 18px;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #111;
+  padding: 25px 30px;
+  border-radius: 6px;
+  border: 3px solid #E82D6A;
+  width: 300px;
+  text-align: center;
+}
+
+.modal-title {
+  color: #E82D6A;
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.modal-text {
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.modal-btn {
+  background: transparent;
+  border: 2px solid #E82D6A;
+  color: #E82D6A;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.hidden {
+  display: none;
+}
