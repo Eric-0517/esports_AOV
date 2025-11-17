@@ -1,30 +1,108 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>隊伍報名 - AOV 城市賽</title>
-<link href="css/style.css" rel="stylesheet">
-<script src="js/main.js" defer></script>
+<title>AOV 賽事報名系統</title>
+<link rel="stylesheet" href="css/register-system.css">
+<script src="js/register-system.js" defer></script>
 </head>
 <body>
-<header class="header">
-  <div class="brand">AOV 城市賽</div>
-  <nav>
-    <a href="index.html" class="btn">首頁</a>
-    <a href="admin.html" class="btn">後台</a>
-  </nav>
-</header>
 
-<section class="register-section">
-  <h1>隊伍報名</h1>
-  <div class="card">
-    <label>隊伍名稱</label>
-    <input class="input" id="teamName">
-    <label>隊員 Discord ID（逗號分隔）</label>
-    <textarea class="input" id="members" rows="4"></textarea>
-    <button class="btn" id="submitTeam">送出報名</button>
+<!-- 主視覺 -->
+<div class="main-visual">
+  <img src="images/main_visual.jpg" class="main-visual-img" alt="主視覺">
+</div>
+
+<!-- 導覽列 -->
+<nav class="nav-bar">
+  <div class="nav-left">
+    親愛的 <span id="username" class="username visitor">訪客</span> 你好
+  </div>
+  <div class="nav-right" id="nav-right">
+    <button class="btn-login" id="login-btn">Discord 登入</button>
+  </div>
+</nav>
+
+<!-- 最新賽事資訊 -->
+<section class="event-section" id="event-home">
+  <h2 class="event-title">最新賽事資訊</h2>
+  <div id="event-list" class="event-list">
+    <!-- JS 注入賽事卡片 -->
+  </div>
+  <p id="no-event" class="no-event hidden">近期尚未舉辦任何賽事！</p>
+</section>
+
+<!-- 編輯個人資料頁 -->
+<section id="profile-page" class="page-section hidden">
+  <h2>個人資料</h2>
+  <form id="profile-form">
+    <label>Discord 帳號: <input type="text" id="discord-name" disabled></label>
+    <label>遊戲暱稱: <input type="text" id="game-nick"></label>
+    <label>遊戲排位: <input type="text" id="game-rank"></label>
+    <label>真實姓名: <input type="text" id="real-name"></label>
+    <label>連絡電話: <input type="text" id="phone"></label>
+    <label>電子信箱: <input type="email" id="email"></label>
+    <label>生日: <input type="date" id="birthday"></label>
+    <label>是否居住在台灣:
+      <select id="taiwan">
+        <option value="yes">是</option>
+        <option value="no">否</option>
+      </select>
+    </label>
+    <label>身分證字號: <input type="text" id="id-number"></label>
+    <div class="form-buttons">
+      <button type="button" id="cancel-profile">取消</button>
+      <button type="submit" id="save-profile">完成</button>
+    </div>
+  </form>
+</section>
+
+<!-- 隊長報名頁 -->
+<section id="leader-page" class="page-section hidden">
+  <h2>隊長報名資訊</h2>
+  <form id="leader-form">
+    <label>隊伍名稱: <input type="text" id="team-name"></label>
+    <label>隊長 (自動帶入 Discord): <input type="text" id="leader-name" disabled></label>
+    <label>隊員 1: <input type="text" id="member1"></label>
+    <label>隊員 2: <input type="text" id="member2"></label>
+    <label>隊員 3: <input type="text" id="member3"></label>
+    <label>隊員 4: <input type="text" id="member4"></label>
+    <label>隊員 5: <input type="text" id="member5"></label>
+    <label>候補隊員: <input type="text" id="sub-member"></label>
+    <div class="form-buttons">
+      <button type="button" id="cancel-leader">取消</button>
+      <button type="submit" id="next-leader">下一步</button>
+    </div>
+    <p class="note">報名完成後，請勿修改遊戲暱稱，避免無法參賽。(#25FAF7)</p>
+  </form>
+</section>
+
+<!-- 隊員報名頁 -->
+<section id="member-page" class="page-section hidden">
+  <h2>隊員報名資訊</h2>
+  <p>Discord 帳號: <span id="member-discord"></span></p>
+  <p>遊戲暱稱: <span id="member-nick"></span></p>
+  <p>遊戲排位: <span id="member-rank"></span></p>
+  <p>真實姓名: <span id="member-real"></span></p>
+  <p>連絡電話: <span id="member-phone"></span></p>
+  <p>電子信箱: <span id="member-email"></span></p>
+  <p>生日: <span id="member-bday"></span></p>
+  <p>是否居住在台灣: <span id="member-taiwan"></span></p>
+  <p>身分證字號: <span id="member-id"></span></p>
+  <div class="form-buttons">
+    <button type="button" id="cancel-member">取消</button>
+    <button type="button" id="confirm-member">確認報名</button>
   </div>
 </section>
+
+<!-- 系統通知 Modal -->
+<div id="system-modal" class="modal hidden">
+  <div class="modal-content">
+    <h3 class="modal-title">系統通知</h3>
+    <p id="modal-text" class="modal-text">請先登入</p>
+    <button class="modal-btn" id="modal-confirm">確認</button>
+  </div>
+</div>
+
 </body>
 </html>
