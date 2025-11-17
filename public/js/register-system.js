@@ -1,31 +1,37 @@
-// 模擬是否登入
-let isLoggedIn = false;
+let isLoggedIn = false; 
 let username = "訪客";
 
-// DOM
 const usernameEl = document.getElementById("username");
 const navRight = document.getElementById("nav-right");
 const modal = document.getElementById("system-modal");
 const modalText = document.getElementById("modal-text");
 const modalConfirm = document.getElementById("modal-confirm");
 
-// 模擬賽事資料（之後可由後台 API 注入）
+// 測試賽事資料
 const events = [
   {
-    name: "AOV 線上賽 - 第 1 週",
-    date: "2025/03/20",
-    signup: "2025/03/01 - 2025/03/10",
+    name: "AOV 線上賽 - 測試賽事",
+    date: "2025/11/30",
+    signup: "2025/11/20 - 2025/11/25",
     status: "報名中"
   }
 ];
 
-// 初始化
+// Discord OAuth 設定
+const clientId = "1403970810762363013";
+const redirectUri = encodeURIComponent("https://你的網站域名/register-system.html");
+const scope = "identify";
+
 window.onload = () => {
   renderEvents();
   updateUserUI();
+
+  // OAuth callback 檢查 URL code
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get("code");
+  if (code) exchangeCodeForUser(code);
 };
 
-// 更新導覽列 UI
 function updateUserUI() {
   usernameEl.textContent = username;
 
@@ -40,38 +46,59 @@ function updateUserUI() {
   }
 }
 
-// 登入模擬
+// 導向 Discord 登入頁
 function login() {
-  modal.classList.remove("hidden");
-  modalText.textContent = "請先登入";
-  modalConfirm.onclick = () => {
-    modal.classList.add("hidden");
-    isLoggedIn = true;
-    username = "玩家1234";
-    updateUserUI();
-  };
+  const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+  window.location.href = oauthUrl;
 }
 
-// 登出
 function logout() {
   isLoggedIn = false;
   username = "訪客";
+  switchPage("event-home");
   updateUserUI();
 }
 
-// 前往個人資訊頁（待你建立）
-function goProfile() {
-  window.location.href = "player.html";
+// OAuth code 交換成使用者資訊
+async function exchangeCodeForUser(code){
+  try {
+    const res = await fetch(`/oauth/callback?code=${code}`); // 後端 API
+    const data = await res.json();
+    if(data.username){
+      username = data.username;
+      isLoggedIn = true;
+      updateUserUI();
+      history.replaceState(null,'','register-system.html'); // 清掉 URL code
+    }
+  } catch(err){
+    console.error(err);
+    modal.classList.remove("hidden");
+    modalText.textContent = "登入失敗，請重新登入 Discord";
+  }
+}
+
+// 頁面切換
+function switchPage(pageId) {
+  const pages = ["event-home", "profile-page", "leader-page", "member-page"];
+  pages.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = "none";
+  });
+  const target = document.getElementById(pageId);
+  if(target) target.style.display = "block";
 }
 
 // 渲染賽事資訊
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
+  list.innerHTML = "";
 
   if (events.length === 0) {
     noEvent.classList.remove("hidden");
     return;
+  } else {
+    noEvent.classList.add("hidden");
   }
 
   events.forEach(ev => {
@@ -95,57 +122,44 @@ function renderEvents() {
 function goSignup(type) {
   if (!isLoggedIn) {
     modal.classList.remove("hidden");
-    modalText.textContent = "請先登入";
+    modalText.textContent = "請先登入 Discord";
     modalConfirm.onclick = () => modal.classList.add("hidden");
     return;
   }
 
-  window.location.href = `event-register.html?type=${type}`;
+  if(type === "team") switchPage("leader-page");
+  else switchPage("member-page");
 }
-// 顯示個人資訊頁
+
+// 前往個人資訊頁
 function goProfile() {
-  document.querySelector(".event-section").style.display = "none";
-  document.getElementById("player-section").style.display = "block";
-
-  loadPlayerInfo();
-}
-
-// 回賽事首頁
-function goEventHome() {
-  document.getElementById("player-section").style.display = "none";
-  document.querySelector(".event-section").style.display = "block";
-}
-
-// 從假資料載入玩家資料（之後可改成後端）
-function loadPlayerInfo() {
-  document.getElementById("p-discord").textContent = username || "未知";
-  document.getElementById("p-nickname").textContent = player.nickname || "未填寫";
-  document.getElementById("p-rank").textContent = player.rank || "未填寫";
-  document.getElementById("p-realname").textContent = player.realname || "未填寫";
-  document.getElementById("p-phone").textContent = player.phone || "未填寫";
-  document.getElementById("p-email").textContent = player.email || "未填寫";
-  document.getElementById("p-birthday").textContent = player.birthday || "未填寫";
-  document.getElementById("p-taiwan").textContent = player.taiwan || "未填寫";
-  document.getElementById("p-id").textContent = player.id || "未填寫";
-
-  // 顯示已報名賽事（假資料）
-  const joinedList = document.getElementById("joined-events");
-  joinedList.innerHTML = "";
-
-  if (joinedEvents.length === 0) {
-    document.getElementById("no-joined").classList.remove("hidden");
-  } else {
-    document.getElementById("no-joined").classList.add("hidden");
-    joinedEvents.forEach(ev => {
-      const div = document.createElement("div");
-      div.className = "joined-card";
-      div.textContent = ev;
-      joinedList.appendChild(div);
-    });
+  if(!isLoggedIn){
+    modal.classList.remove("hidden");
+    modalText.textContent = "請先登入 Discord";
+    modalConfirm.onclick = () => modal.classList.add("hidden");
+    return;
   }
+  switchPage("profile-page");
 }
 
-// 編輯資料（跳 modal 或切換頁 —之後我可幫你做）
-function editPlayer() {
-  alert("此處可切換到編輯個人資料模式，我可幫你做完整介面");
+// 返回賽事首頁
+function goEventHome() {
+  switchPage("event-home");
 }
+
+// 綁定按鈕事件
+document.getElementById("save-profile")?.addEventListener("click",()=>{
+  alert("個人資料已更新");
+  goEventHome();
+});
+document.getElementById("cancel-profile")?.addEventListener("click", goEventHome);
+document.getElementById("cancel-leader")?.addEventListener("click", goEventHome);
+document.getElementById("next-leader")?.addEventListener("click", ()=> switchPage("member-page"));
+document.getElementById("cancel-member")?.addEventListener("click", goEventHome);
+document.getElementById("confirm-member")?.addEventListener("click", ()=> {
+  alert("報名完成！");
+  goEventHome();
+});
+
+// Modal 確認
+modalConfirm.onclick = ()=> modal.classList.add("hidden");
