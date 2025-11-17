@@ -146,3 +146,44 @@ body {
 .hidden {
   display: none;
 }
+.player-section {
+  padding: 20px;
+}
+
+.player-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.btn-back, .btn-logout {
+  background: #FE2078;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.player-title {
+  color: #2FD6FA;
+  font-size: 26px;
+}
+
+.player-info-box p {
+  margin: 6px 0;
+}
+
+.divide-line {
+  margin: 20px 0;
+  border: 1px solid #2FD6FA;
+}
+
+.joined-events-list .joined-card {
+  background: #111;
+  padding: 12px;
+  border: 1px solid #2FD6FA;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
