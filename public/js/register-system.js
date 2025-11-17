@@ -102,3 +102,50 @@ function goSignup(type) {
 
   window.location.href = `event-register.html?type=${type}`;
 }
+// 顯示個人資訊頁
+function goProfile() {
+  document.querySelector(".event-section").style.display = "none";
+  document.getElementById("player-section").style.display = "block";
+
+  loadPlayerInfo();
+}
+
+// 回賽事首頁
+function goEventHome() {
+  document.getElementById("player-section").style.display = "none";
+  document.querySelector(".event-section").style.display = "block";
+}
+
+// 從假資料載入玩家資料（之後可改成後端）
+function loadPlayerInfo() {
+  document.getElementById("p-discord").textContent = username || "未知";
+  document.getElementById("p-nickname").textContent = player.nickname || "未填寫";
+  document.getElementById("p-rank").textContent = player.rank || "未填寫";
+  document.getElementById("p-realname").textContent = player.realname || "未填寫";
+  document.getElementById("p-phone").textContent = player.phone || "未填寫";
+  document.getElementById("p-email").textContent = player.email || "未填寫";
+  document.getElementById("p-birthday").textContent = player.birthday || "未填寫";
+  document.getElementById("p-taiwan").textContent = player.taiwan || "未填寫";
+  document.getElementById("p-id").textContent = player.id || "未填寫";
+
+  // 顯示已報名賽事（假資料）
+  const joinedList = document.getElementById("joined-events");
+  joinedList.innerHTML = "";
+
+  if (joinedEvents.length === 0) {
+    document.getElementById("no-joined").classList.remove("hidden");
+  } else {
+    document.getElementById("no-joined").classList.add("hidden");
+    joinedEvents.forEach(ev => {
+      const div = document.createElement("div");
+      div.className = "joined-card";
+      div.textContent = ev;
+      joinedList.appendChild(div);
+    });
+  }
+}
+
+// 編輯資料（跳 modal 或切換頁 —之後我可幫你做）
+function editPlayer() {
+  alert("此處可切換到編輯個人資料模式，我可幫你做完整介面");
+}
