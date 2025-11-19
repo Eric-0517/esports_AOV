@@ -49,6 +49,7 @@ function updateUserUI() {
 
 // 導向 Discord 登入頁
 function login() {
+  const redirectUri = encodeURIComponent("https://esportsmoba.dpdns.org/auth/discord/callback");
   const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
   window.location.href = oauthUrl;
 }
