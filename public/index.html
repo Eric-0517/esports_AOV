@@ -95,22 +95,18 @@
     <style>
 .reg-img-link {
     display: inline-block;
-    border: 1px solid #2FD6FA;
-    border-radius: 12px;
-    padding: 6px;  /* 讓框線與圖片有間距 */
+    border: 1px solid #2FD6FA; /* 外框線 */
+    padding: 0;                /* 框線緊貼圖片 */
+    margin: 10px;              /* 分開圖片用，避免貼太近 */
 }
+
 .reg-option-img {
     display: block;
+    width: 100%;
+    height: auto;
 }
 </style>
 
-<a href="/register-system.html" class="reg-img-link">
-    <img src="images/team.png" alt="隊伍報名" class="reg-option-img">
-</a>
-
-<a href="/register-system.html" class="reg-img-link">
-    <img src="images/individual.png" alt="個人報名" class="reg-option-img">
-</a>
 
     <!-- 團隊報名 -->
     <a href="/register-system.html" class="reg-img-link">
