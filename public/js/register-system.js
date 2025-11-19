@@ -1,4 +1,4 @@
-let isLoggedIn = false; 
+let isLoggedIn = false;
 let username = "訪客";
 
 const usernameEl = document.getElementById("username");
@@ -19,20 +19,20 @@ const events = [
 
 // Discord OAuth 設定
 const clientId = "1403970810762363013";
-const redirectUri = "https://esportsmoba.dpdns.org/register-system.html"; // 直接使用完整英文 URL
+const redirectUri = "https://esportsmoba.dpdns.org/register-system.html"; // 固定英文 URL
 const scope = "identify";
 
 window.onload = () => {
   renderEvents();
   updateUserUI();
 
-  // OAuth callback 檢查 URL code
+  // 檢查 URL token (JWT)
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");
   if (token) handleToken(token);
 };
 
-// 更新 UI
+// 更新使用者介面
 function updateUserUI() {
   usernameEl.textContent = username;
 
@@ -49,7 +49,9 @@ function updateUserUI() {
 
 // 導向 Discord 登入頁
 function login() {
+  // 直接使用固定完整 URL
   const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+  console.log("OAuth URL:", oauthUrl); // 可檢查
   window.location.href = oauthUrl;
 }
 
@@ -70,7 +72,7 @@ function handleToken(token) {
     updateUserUI();
     history.replaceState(null, '', 'register-system.html'); // 清掉 URL token
   } catch (err) {
-    console.error(err);
+    console.error("JWT 解析錯誤:", err);
   }
 }
 
