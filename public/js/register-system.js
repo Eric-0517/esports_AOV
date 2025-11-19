@@ -19,7 +19,7 @@ const events = [
 
 // Discord OAuth 設定
 const clientId = "1403970810762363013";
-const redirectUri = encodeURIComponent(`${window.location.origin}/auth/discord/callback`); // 指向後端 callback
+const redirectUri = "https://esportsmoba.dpdns.org/register-system.html"; // 直接使用完整英文 URL
 const scope = "identify";
 
 window.onload = () => {
@@ -49,8 +49,7 @@ function updateUserUI() {
 
 // 導向 Discord 登入頁
 function login() {
-  const redirectUri = encodeURIComponent("https://esportsmoba.dpdns.org/auth/discord/callback");
-  const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+  const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
   window.location.href = oauthUrl;
 }
 
@@ -64,7 +63,6 @@ function logout() {
 
 // 收到 JWT 後處理
 function handleToken(token) {
-  // 解 JWT (可用 jwt-decode 或自己解析)
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     username = payload.username || "Discord使用者";
