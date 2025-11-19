@@ -19,7 +19,7 @@ const events = [
 
 // Discord OAuth 設定
 const clientId = "1403970810762363013";
-const redirectUri = encodeURIComponent("https://你的網站域名/register-system.html");
+const redirectUri = encodeURIComponent("https://esportsmoba.dpdns.org/register-system.html");
 const scope = "identify";
 
 window.onload = () => {
@@ -40,7 +40,7 @@ function updateUserUI() {
     document.getElementById("login-btn").onclick = login;
   } else {
     navRight.innerHTML = `
-      <button class="btn-login" onclick="goProfile()">個人資訊 / 已報名資訊</button>
+      <button class="btn-login" onclick="goProfile()">個人資訊/已報名資訊</button>
       <button class="btn-login" onclick="logout()">登出</button>
     `;
   }
