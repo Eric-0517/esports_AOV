@@ -40,6 +40,8 @@
   <div class="player-info-box">
     <div class="player-info-box">
   <div class="info-row">
+    <div class="player-info-box">
+  <div class="info-row">
     <label for="p-discord">Discord 名稱：</label>
     <span id="p-discord"></span>
   </div>
@@ -78,6 +80,47 @@
     <label for="p-id">身分證字號：</label>
     <input type="text" id="p-id" placeholder="輸入身分證字號">
   </div>
+</div>
+
+<style>
+.player-info-box {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.info-row label {
+  width: 120px;
+  font-weight: bold;
+}
+
+.info-row input,
+.info-row select,
+.info-row span {
+  flex: 1;
+  padding: 6px 10px;
+  border: 2px solid #2FD6FA; /* 藍色邊框 */
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.info-row input:focus,
+.info-row select:focus {
+  outline: none;
+  border-color: #1AAEDB; /* 聚焦時加深藍色 */
+}
+
+.info-row span {
+  display: inline-block;
+  line-height: 28px;
+  background-color: #f0f8ff; /* 淡藍背景，凸顯 Discord 名稱 */
+}
+</style>
 </div>
 
   <div class="btn-row">
