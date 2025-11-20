@@ -10,12 +10,19 @@ const adminRoutes = require('./routes/admin');
 dotenv.config();
 const app = express();
 
+// JSON 解析
 app.use(express.json());
 
-// MongoDB Connect
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((e) => console.error(e));
+// --- MongoDB Connect ---
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB connected"))
+.catch((err) => {
+  console.error("❌ MongoDB connection error:", err);
+  process.exit(1); // 連線失敗直接停止伺服器
+});
 
 // --- 靜態檔案（CSS / JS / images）---
 app.use(express.static(path.join(__dirname, '../public')));
@@ -30,5 +37,11 @@ app.use('/auth', authRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/admin', adminRoutes);
 
+// --- 404 頁面 ---
+app.use((req, res) => {
+  res.status(404).send("404 Not Found");
+});
+
+// --- Server 啟動 ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Server running on port", PORT));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
