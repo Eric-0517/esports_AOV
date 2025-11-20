@@ -237,6 +237,24 @@ window.onload = () => {
   renderEvents();
   updateUserUI();
 
+  // Discord 名稱自動帶入
+document.getElementById('p-discord').textContent = username;
+
+// 遊戲暱稱 / 排位只能填寫一次
+const nicknameEl = document.getElementById('p-nickname');
+const rankEl = document.getElementById('p-rank');
+
+if(savedProfile){ // savedProfile 從後端或 localStorage 拿到
+  if(savedProfile.nickname){
+    nicknameEl.value = savedProfile.nickname;
+    nicknameEl.disabled = true;
+  }
+  if(savedProfile.rank){
+    rankEl.value = savedProfile.rank;
+    rankEl.disabled = true;
+  }
+}
+
   // 取得 JWT
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");
