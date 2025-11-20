@@ -49,12 +49,18 @@ function updateUserUI() {
 
 // Discord OAuth 登入
 function login() {
-  const oauthUrl = 
-    `https://discord.com/oauth2/authorize?client_id=${clientId}` +
-    `&redirect_uri=${redirectUri}` +
-    `&response_type=code&scope=${scope}`;
+  const clientId = "1403970810762363013";
+  const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback"; // 正確的後端 callback
+  const scope = "identify";
 
-  console.log("OAuth URL:", oauthUrl);
+  const oauthUrl =
+    `https://discord.com/oauth2/authorize` +
+    `?client_id=${clientId}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&response_type=code` +
+    `&scope=${encodeURIComponent(scope)}`;
+
+  console.log("Redirect to:", oauthUrl);
   window.location.href = oauthUrl;
 }
 
