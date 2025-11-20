@@ -10,14 +10,14 @@ router.get('/discord/callback', async (req, res) => {
 
   try {
     // Discord MUST match EXACTLY the redirect_uri registered in Dev Portal
-    const redirectUri = "https://esportsmoba.dpdns.org/discord/callback";
+    const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback";
 
     const data = new URLSearchParams({
       client_id: process.env.DISCORD_CLIENT_ID,
       client_secret: process.env.DISCORD_CLIENT_SECRET,
       grant_type: "authorization_code",
       code,
-      redirect_uri: redirectUri, // ⭐ 注意：必須完全一致
+      redirect_uri: redirectUri, 
       scope: "identify"
     });
 
