@@ -1,100 +1,75 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<title>傳說對決線上賽事報名系統</title>
-<link rel="stylesheet" href="css/register-system.css">
-<script src="js/register-system.js" defer></script>
-</head>
-<body>
+// 你的後端 API 網域
+const BACKEND = "https://esportsmoba.dpdns.org";
 
-<!-- 主視覺 -->
-<div class="main-visual">
-  <img src="images/main_visual2.png" class="main-visual-img" alt="主視覺">
-</div>
+// Discord OAuth2 固定設定
+const CLIENT_ID = "1403970810762363013";
+const REDIRECT_URI = "https://esportsmoba.dpdns.org/register-system.html";
+const SCOPE = "identify";
 
-<!-- 導覽列 -->
-<nav class="nav-bar">
-  <div class="nav-left">
-    親愛的 <span id="username" class="username visitor">訪客</span> 你好
-  </div>
-  <div class="nav-right" id="nav-right">
-    <button class="btn-login" id="login-btn">Discord 登入</button>
-  </div>
-</nav>
+// =====================================================================
+// 1. 按下登入 → 跳轉 Discord OAuth2
+// =====================================================================
+document.getElementById("login-btn").addEventListener("click", () => {
+    const authUrl =
+        "https://discord.com/oauth2/authorize" +
+        "?client_id=" + CLIENT_ID +
+        "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) +
+        "&response_type=code" +
+        "&scope=" + SCOPE;
 
-<!-- 賽事首頁 -->
-<section id="event-home" class="event-section page-section">
-  <h2 class="event-title">最新賽事資訊</h2>
-  <div id="event-list" class="event-list"></div>
-  <p id="no-event" class="no-event hidden">近期尚未舉辦任何賽事！</p>
-</section>
+    window.location.href = authUrl;
+});
 
-<!-- 個人資料頁 -->
-<section id="profile-page" class="player-section page-section hidden">
-  <div class="player-nav">
-    <button class="btn-back" id="back-home">回賽事首頁</button>
-    <button class="btn-logout" id="logout-btn">登出</button>
-  </div>
-  <h2 class="player-title">個人資料</h2>
-  <div class="player-info-box">
-    <p>Discord 名稱：<span id="p-discord"></span></p>
-    <p>遊戲暱稱：<input type="text" id="p-nickname"></p>
-    <p>遊戲排位：<input type="text" id="p-rank"></p>
-    <p>真實姓名：<input type="text" id="p-realname"></p>
-    <p>連絡電話：<input type="text" id="p-phone"></p>
-    <p>電子信箱：<input type="email" id="p-email"></p>
-    <p>生日：<input type="date" id="p-birthday"></p>
-    <p>是否居住台灣：
-      <select id="p-taiwan">
-        <option value="是">是</option>
-        <option value="否">否</option>
-      </select>
-    </p>
-    <p>身分證字號：<input type="text" id="p-id"></p>
-  </div>
-  <div class="btn-row">
-    <button id="cancel-profile">取消</button>
-    <button id="save-profile">完成</button>
-  </div>
-  <div class="divide-line"></div>
-  <h3>已報名賽事</h3>
-  <div id="joined-events" class="joined-events-list"></div>
-  <p id="no-joined" class="no-event hidden">尚無已報名賽事</p>
-</section>
+// =====================================================================
+// 2. 回到此頁時 → 自動解析 ?code=xxxxx
+// =====================================================================
+async function checkOAuthLogin() {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
 
-<!-- 隊長報名頁 -->
-<section id="leader-page" class="player-section page-section hidden">
-  <div class="player-nav">
-    <button class="btn-back" id="back-home-leader">取消</button>
-  </div>
-  <h2 class="player-title">隊長報名</h2>
-  <p>隊長資訊由登入帳號自動帶入</p>
-  <div class="btn-row">
-    <button id="next-leader">下一步</button>
-  </div>
-</section>
+    if (!code) return; // 沒 code = 仍未登入
 
-<!-- 隊員報名頁 -->
-<section id="member-page" class="player-section page-section hidden">
-  <div class="player-nav">
-    <button class="btn-back" id="back-home-member">取消</button>
-  </div>
-  <h2 class="player-title">隊員報名</h2>
-  <p>玩家序號由系統生成</p>
-  <div class="btn-row">
-    <button id="confirm-member">確認報名</button>
-  </div>
-</section>
+    // 呼叫後端，交換 token + 取得使用者資料
+    const res = await fetch(`${BACKEND}/auth?code=${code}`);
+    const data = await res.json();
 
-<!-- 系統通知 Modal -->
-<div id="system-modal" class="modal hidden">
-  <div class="modal-content">
-    <h3 class="modal-title">系統通知</h3>
-    <p id="modal-text" class="modal-text">請先登入</p>
-    <button class="modal-btn" id="modal-confirm">確認</button>
-  </div>
-</div>
+    if (data.success) {
+        // 🎉 成功登入！
+        updateUI(data.user);
+    } else {
+        console.log("登入失敗");
+    }
+}
 
-</body>
-</html>
+// =====================================================================
+// 3. 更新前端畫面（顯示 Discord 名稱、切換按鈕）
+// =====================================================================
+function updateUI(user) {
+    document.getElementById("username").innerText =
+        `${user.username}#${user.discriminator}`;
+    document.getElementById("username").classList.remove("visitor");
+
+    // 隱藏登入 + 顯示登出
+    document.getElementById("nav-right").innerHTML = `
+        <button class="btn-logout" id="logout-btn">登出</button>
+    `;
+
+    // 玩家資料頁同步顯示
+    document.getElementById("p-discord").innerText =
+        `${user.username}#${user.discriminator}`;
+
+    // 綁定登出事件
+    document.getElementById("logout-btn").addEventListener("click", logout);
+}
+
+// =====================================================================
+// 4. 登出（清除 URL code 並重新整理）
+// =====================================================================
+function logout() {
+    window.location.href = REDIRECT_URI; // 清除 ?code=xxx
+}
+
+// =====================================================================
+// 5. 初始化
+// =====================================================================
+checkOAuthLogin();
