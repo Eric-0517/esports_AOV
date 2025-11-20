@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const teamRoutes = require('./routes/teams');
 const adminRoutes = require('./routes/admin');
+const profileRoutes = require('./routes/profile');
+app.use('/api/profile', profileRoutes);
 
 dotenv.config();
 const app = express();
