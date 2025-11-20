@@ -7,32 +7,27 @@ const modal = document.getElementById("system-modal");
 const modalText = document.getElementById("modal-text");
 const modalConfirm = document.getElementById("modal-confirm");
 
-// 測試賽事資料
-const events = [
-  {
-    name: "AOV 線上賽 - 測試賽事",
-    date: "2025/11/30",
-    signup: "2025/11/20 - 2025/11/25",
-    status: "報名中"
-  }
-];
-
 // Discord OAuth 設定
 const clientId = "1403970810762363013";
-const redirectUri = encodeURIComponent("https://esportsmoba.dpdns.org/discord/callback");
+const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback"; // 後端 callback
 const scope = "identify";
+
+// 假資料
+const events = [
+  { name: "AOV 線上賽 - 測試賽事", date: "2025/11/30", signup: "2025/11/20 - 2025/11/25", status: "報名中" }
+];
 
 window.onload = () => {
   renderEvents();
   updateUserUI();
 
-  // 檢查 URL token (JWT)
+  // 取得 JWT
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");
   if (token) handleToken(token);
 };
 
-// 更新使用者 UI
+// 更新 UI
 function updateUserUI() {
   usernameEl.textContent = username;
 
@@ -49,18 +44,12 @@ function updateUserUI() {
 
 // Discord OAuth 登入
 function login() {
-  const clientId = "1403970810762363013";
-  const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback"; // 正確的後端 callback
-  const scope = "identify";
-
   const oauthUrl =
     `https://discord.com/oauth2/authorize` +
     `?client_id=${clientId}` +
-    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&redirect_uri=${encodeURIComponent(backendCallback)}` +
     `&response_type=code` +
     `&scope=${encodeURIComponent(scope)}`;
-
-  console.log("Redirect to:", oauthUrl);
   window.location.href = oauthUrl;
 }
 
@@ -72,7 +61,7 @@ function logout() {
   updateUserUI();
 }
 
-// 收到 JWT 後解析
+// 處理 JWT
 function handleToken(token) {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
@@ -80,7 +69,7 @@ function handleToken(token) {
     isLoggedIn = true;
     updateUserUI();
 
-    // 清除 URL 的 token，避免刷新後重複登入
+    // 清除 URL token
     history.replaceState(null, "", "register-system.html");
   } catch (err) {
     console.error("JWT 解析錯誤:", err);
@@ -90,26 +79,17 @@ function handleToken(token) {
 // 頁面切換
 function switchPage(pageId) {
   const pages = ["event-home", "profile-page", "leader-page", "member-page"];
-  pages.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
+  pages.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = "none"; });
   const target = document.getElementById(pageId);
-  if (target) target.style.display = "block";
+  if(target) target.style.display = "block";
 }
 
-// 渲染賽事列表
+// 渲染賽事
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
   list.innerHTML = "";
-
-  if (events.length === 0) {
-    noEvent.classList.remove("hidden");
-    return;
-  } else {
-    noEvent.classList.add("hidden");
-  }
+  if (events.length === 0) { noEvent.classList.remove("hidden"); return; } else { noEvent.classList.add("hidden"); }
 
   events.forEach(ev => {
     const div = document.createElement("div");
@@ -128,48 +108,19 @@ function renderEvents() {
   });
 }
 
-// 點擊報名
-function goSignup(type) {
-  if (!isLoggedIn) {
-    modal.classList.remove("hidden");
-    modalText.textContent = "請先登入 Discord";
-    modalConfirm.onclick = () => modal.classList.add("hidden");
-    return;
-  }
+// 報名 & 個人頁
+function goSignup(type) { if(!isLoggedIn){ showModal("請先登入 Discord"); return; } type==='team'?switchPage('leader-page'):switchPage('member-page'); }
+function goProfile() { if(!isLoggedIn){ showModal("請先登入 Discord"); return; } switchPage('profile-page'); }
+function goEventHome() { switchPage("event-home"); }
 
-  if (type === "team") switchPage("leader-page");
-  else switchPage("member-page");
-}
-
-// 個人資訊頁
-function goProfile() {
-  if (!isLoggedIn) {
-    modal.classList.remove("hidden");
-    modalText.textContent = "請先登入 Discord";
-    modalConfirm.onclick = () => modal.classList.add("hidden");
-    return;
-  }
-  switchPage("profile-page");
-}
-
-// 返回首頁
-function goEventHome() {
-  switchPage("event-home");
-}
+// Modal
+function showModal(msg){ modalText.textContent = msg; modal.classList.remove("hidden"); }
+modalConfirm.onclick = ()=> modal.classList.add("hidden");
 
 // 按鈕事件
-document.getElementById("save-profile")?.addEventListener("click", () => {
-  alert("個人資料已更新");
-  goEventHome();
-});
+document.getElementById("save-profile")?.addEventListener("click",()=>{ alert("個人資料已更新"); goEventHome(); });
 document.getElementById("cancel-profile")?.addEventListener("click", goEventHome);
 document.getElementById("cancel-leader")?.addEventListener("click", goEventHome);
-document.getElementById("next-leader")?.addEventListener("click", () => switchPage("member-page"));
+document.getElementById("next-leader")?.addEventListener("click", ()=> switchPage("member-page"));
 document.getElementById("cancel-member")?.addEventListener("click", goEventHome);
-document.getElementById("confirm-member")?.addEventListener("click", () => { 
-  alert("報名完成！"); 
-  goEventHome(); 
-});
-
-// Modal 按鈕
-modalConfirm.onclick = () => modal.classList.add("hidden");
+document.getElementById("confirm-member")?.addEventListener("click", ()=> { alert("報名完成"); goEventHome(); });
