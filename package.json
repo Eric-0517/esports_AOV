@@ -1,4 +1,3 @@
-
 {
   "name": "esports_garena_style",
   "version": "1.0.0",
@@ -11,6 +10,7 @@
     "express": "^4.18.2",
     "mongoose": "^7.5.0",
     "jsonwebtoken": "^9.0.2",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
   }
 }
