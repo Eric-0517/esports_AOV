@@ -1,50 +1,72 @@
-require("dotenv").config();
+// routes/auth.js
 const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const mongoose = require("mongoose");
+const axios = require("axios");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User"); // 你需要建立 User model
+const router = express.Router();
 
-// Routers
-const authRouter = require("./routes/auth");
+// Discord OAuth callback
+router.get("/discord/callback", async (req, res) => {
+  const code = req.query.code;
+  if (!code) return res.status(400).send("No code in query");
 
-const app = express();
+  try {
+    const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback"; // 與 Discord App 設定一致
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
+    const data = new URLSearchParams({
+      client_id: process.env.DISCORD_CLIENT_ID,
+      client_secret: process.env.DISCORD_CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: redirectUri,
+      scope: "identify",
+    });
 
-// 靜態 public 資料夾
-app.use(express.static(path.join(__dirname, "../public")));
+    // 交換 access token
+    const tokenRes = await axios.post(
+      "https://discord.com/api/oauth2/token",
+      data.toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
 
-// ---- 連接 MongoDB ----
-mongoose.connect(process.env.MONGO_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("MongoDB 連線成功"))
-.catch(err => console.error("MongoDB 連線失敗:", err));
+    const access_token = tokenRes.data.access_token;
 
+    // 取得 Discord 使用者資料
+    const userRes = await axios.get("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
 
-// ---- Router 註冊 ----
-app.use("/auth", authRouter);
+    const u = userRes.data;
 
+    // 建立或更新使用者資料
+    const user = await User.findOneAndUpdate(
+      { discordId: u.id },
+      {
+        discordId: u.id,
+        username: u.username,
+        discriminator: u.discriminator,
+        avatar: u.avatar,
+      },
+      { upsert: true, new: true }
+    );
 
-// ---- 預設首頁 index.html ----
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+    // 生成 JWT
+    const token = jwt.sign(
+      {
+        sub: user.discordId,
+        role: user.role || "user",
+        username: user.username,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // 導回前端並帶上 token
+    res.redirect(`https://esportsmoba.dpdns.org/register-system.html?token=${token}`);
+  } catch (err) {
+    console.error("Discord OAuth error:", err.response?.data || err.message || err);
+    res.status(500).send("Discord OAuth error");
+  }
 });
 
-// ---- 🔥 最重要：註冊頁面（避免 404）----
-app.get("/register-system.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/register-system.html"));
-});
-
-// ---- 其他所有前端頁面都給 public ----
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
-});
-
-
-// ---- 啟動伺服器 ----
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports = router;
