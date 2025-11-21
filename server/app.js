@@ -4,8 +4,8 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-const authRoutes = require("./routes/auth.js"); // Discord OAuth
-const profileRoutes = require("./routes/profile.js");
+const authRoutes = require("./routes/auth"); // Discord OAuth
+const profileRoutes = require("./routes/profile");
 
 dotenv.config();
 const app = express();
