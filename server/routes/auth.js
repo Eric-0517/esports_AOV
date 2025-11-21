@@ -5,7 +5,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 
 // Routers
-const authRouter = require("./routes/auth.js");
+const authRouter = require("./routes/auth");
 
 const app = express();
 
