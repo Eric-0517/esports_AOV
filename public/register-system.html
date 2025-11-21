@@ -3,8 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>傳說對決線上賽事報名系統</title>
+
+<!-- CSS -->
 <link rel="stylesheet" href="css/register-system.css">
+
+<!-- ❗ 只保留一份 JS，避免重複宣告 -->
 <script src="js/register-system.js" defer></script>
+
 </head>
 <body>
 
@@ -36,143 +41,64 @@
     <button class="btn-back" id="back-home">回賽事首頁</button>
     <button class="btn-logout" id="logout-btn">登出</button>
   </div>
+
   <h2 class="player-title">個人資料</h2>
-  <div class="player-info-box">
-    <div class="player-info-box">
-  <div class="info-row">
-    <div class="player-info-box">
-  <div class="info-row">
-   <div class="profile-form">
-  <div class="info-row">
-    <label for="p-discord">Discord 名稱：</label>
-    <span id="p-discord"></span>
+
+  <div class="profile-form">
+    <div class="info-row">
+      <label for="p-discord">Discord 名稱：</label>
+      <span id="p-discord"></span>
+    </div>
+
+    <div class="info-row">
+      <label for="p-nickname">遊戲暱稱：</label>
+      <input type="text" id="p-nickname" placeholder="輸入遊戲暱稱">
+    </div>
+
+    <div class="info-row">
+      <label for="p-rank">遊戲排位：</label>
+      <input type="text" id="p-rank" placeholder="輸入遊戲排位">
+    </div>
+
+    <div class="info-row">
+      <label for="p-realname">真實姓名：</label>
+      <input type="text" id="p-realname" placeholder="輸入真實姓名">
+    </div>
+
+    <div class="info-row">
+      <label for="p-phone">連絡電話：</label>
+      <input type="text" id="p-phone" placeholder="輸入連絡電話">
+    </div>
+
+    <div class="info-row">
+      <label for="p-email">電子信箱：</label>
+      <input type="email" id="p-email" placeholder="輸入電子信箱">
+    </div>
+
+    <div class="info-row">
+      <label for="p-birthday">生日：</label>
+      <input type="date" id="p-birthday">
+    </div>
+
+    <div class="info-row">
+      <label for="p-taiwan">是否居住台灣：</label>
+      <select id="p-taiwan">
+        <option value="是">是</option>
+        <option value="否">否</option>
+      </select>
+    </div>
+
+    <div class="info-row">
+      <label for="p-id">身分證字號：</label>
+      <input type="text" id="p-id" placeholder="輸入身分證字號">
+    </div>
   </div>
-  <div class="info-row">
-    <label for="p-nickname">遊戲暱稱：</label>
-    <input type="text" id="p-nickname" placeholder="輸入遊戲暱稱">
-  </div>
-  <div class="info-row">
-    <label for="p-rank">遊戲排位：</label>
-    <input type="text" id="p-rank" placeholder="輸入遊戲排位">
-  </div>
-  <div class="info-row">
-    <label for="p-realname">真實姓名：</label>
-    <input type="text" id="p-realname" placeholder="輸入真實姓名">
-  </div>
-  <div class="info-row">
-    <label for="p-phone">連絡電話：</label>
-    <input type="text" id="p-phone" placeholder="輸入連絡電話">
-  </div>
-  <div class="info-row">
-    <label for="p-email">電子信箱：</label>
-    <input type="email" id="p-email" placeholder="輸入電子信箱">
-  </div>
-  <div class="info-row">
-    <label for="p-birthday">生日：</label>
-    <input type="date" id="p-birthday">
-  </div>
-  <div class="info-row">
-    <label for="p-taiwan">是否居住台灣：</label>
-    <select id="p-taiwan">
-      <option value="是">是</option>
-      <option value="否">否</option>
-    </select>
-  </div>
-  <div class="info-row">
-    <label for="p-id">身分證字號：</label>
-    <input type="text" id="p-id" placeholder="輸入身分證字號">
-  </div>
-</div>
-
-<style>
-.profile-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 15px;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.info-row label {
-  width: 130px; /* 標籤固定寬度 */
-  font-weight: bold;
-  text-align: left;
-}
-
-.info-row input,
-.info-row select,
-.info-row span {
-  flex: 1;
-  padding: 6px 10px;
-  border: 2px solid #2FD6FA; /* 藍色邊框 */
-  border-radius: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-.info-row span {
-  display: inline-block;
-  line-height: 28px;
-  background-color: #f5f5f5;
-}
-
-.info-row input:disabled {
-  background-color: #eee;
-  color: #555;
-}
-</style>
-
-</div>
-
-<style>
-.player-info-box {
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.info-row label {
-  width: 120px;
-  font-weight: bold;
-}
-
-.info-row input,
-.info-row select,
-.info-row span {
-  flex: 1;
-  padding: 6px 10px;
-  border: 2px solid #2FD6FA; /* 藍色邊框 */
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.info-row input:focus,
-.info-row select:focus {
-  outline: none;
-  border-color: #1AAEDB; /* 聚焦時加深藍色 */
-}
-
-.info-row span {
-  display: inline-block;
-  line-height: 28px;
-  background-color: #f0f8ff; /* 淡藍背景，凸顯 Discord 名稱 */
-}
-</style>
-</div>
 
   <div class="btn-row">
     <button id="cancel-profile">取消</button>
     <button id="save-profile">完成</button>
   </div>
+
   <div class="divide-line"></div>
   <h3>已報名賽事</h3>
   <div id="joined-events" class="joined-events-list"></div>
@@ -206,154 +132,14 @@
   </div>
 </section>
 
-<!-- 系統通知 Modal -->
+<!-- Modal -->
 <div id="system-modal" class="modal hidden">
   <div class="modal-content">
     <h3 class="modal-title">系統通知</h3>
-    <p id="modal-text" class="modal-text">請先登入</p>
-    <button class="modal-btn" id="modal-confirm">確認</button>
+    <p id="modal-text">請先登入</p>
+    <button id="modal-confirm">確認</button>
   </div>
 </div>
-
-<script>
-let isLoggedIn = false;
-let username = "訪客";
-
-const usernameEl = document.getElementById("username");
-const navRight = document.getElementById("nav-right");
-const modal = document.getElementById("system-modal");
-const modalText = document.getElementById("modal-text");
-const modalConfirm = document.getElementById("modal-confirm");
-
-const events = [
-  { name: "AOV 線上賽 - 測試賽事", date: "2025/11/30", signup: "2025/11/20 - 2025/11/25", status: "報名中" }
-];
-
-const clientId = "1403970810762363013";
-const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
-const scope = "identify";
-
-window.onload = () => {
-  renderEvents();
-  updateUserUI();
-
-  // Discord 名稱自動帶入
-document.getElementById('p-discord').textContent = username;
-
-// 遊戲暱稱 / 排位只能填寫一次
-const nicknameEl = document.getElementById('p-nickname');
-const rankEl = document.getElementById('p-rank');
-
-if(savedProfile){ // savedProfile 從後端或 localStorage 拿到
-  if(savedProfile.nickname){
-    nicknameEl.value = savedProfile.nickname;
-    nicknameEl.disabled = true;
-  }
-  if(savedProfile.rank){
-    rankEl.value = savedProfile.rank;
-    rankEl.disabled = true;
-  }
-}
-
-  // 取得 JWT
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
-  if (token) handleToken(token);
-};
-
-function updateUserUI() {
-  usernameEl.textContent = username;
-
-  // 隊長報名自動帶入
-  const leaderDiscord = document.getElementById("leader-discord");
-  if (leaderDiscord) leaderDiscord.textContent = username;
-
-  if (!isLoggedIn) {
-    navRight.innerHTML = `<button class="btn-login" id="login-btn">Discord 登入</button>`;
-    document.getElementById("login-btn").onclick = login;
-  } else {
-    navRight.innerHTML = `
-      <button class="btn-login" onclick="goProfile()">個人資訊/已報名資訊</button>
-      <button class="btn-login" onclick="logout()">登出</button>
-    `;
-  }
-}
-
-function login() {
-  const oauthUrl =
-    `https://discord.com/oauth2/authorize` +
-    `?client_id=${clientId}` +
-    `&redirect_uri=${encodeURIComponent(backendCallback)}` +
-    `&response_type=code` +
-    `&scope=${encodeURIComponent(scope)}`;
-  window.location.href = oauthUrl;
-}
-
-function logout() {
-  isLoggedIn = false;
-  username = "訪客";
-  switchPage("event-home");
-  updateUserUI();
-}
-
-function handleToken(token) {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    username = payload.username || "Discord使用者";
-    isLoggedIn = true;
-    updateUserUI();
-    history.replaceState(null, "", "register-system.html");
-  } catch (err) {
-    console.error("JWT 解析錯誤:", err);
-  }
-}
-
-function switchPage(pageId) {
-  const pages = ["event-home","profile-page","leader-page","member-page"];
-  pages.forEach(id => { const el = document.getElementById(id); if(el) el.style.display="none"; });
-  const target = document.getElementById(pageId);
-  if(target) target.style.display="block";
-}
-
-function renderEvents() {
-  const list = document.getElementById("event-list");
-  const noEvent = document.getElementById("no-event");
-  list.innerHTML = "";
-  if(events.length===0){ noEvent.classList.remove("hidden"); return; } else { noEvent.classList.add("hidden"); }
-  events.forEach(ev=>{
-    const div=document.createElement("div");
-    div.className="event-card";
-    div.innerHTML=`
-      <div class="event-name">${ev.name}</div>
-      <div class="event-info">比賽日期：${ev.date}</div>
-      <div class="event-info">報名時間：${ev.signup}</div>
-      <div class="event-info">狀態：${ev.status}</div>
-      <div class="card-btn-row">
-        <div class="card-btn" onclick="goSignup('team')">團體報名</div>
-        <div class="card-btn" onclick="goSignup('solo')">個人報名</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-function goSignup(type){ 
-  if(!isLoggedIn){ showModal("請先登入 Discord"); return; }
-  type==="team"?switchPage("leader-page"):switchPage("member-page");
-}
-function goProfile(){ if(!isLoggedIn){ showModal("請先登入 Discord"); return; } switchPage("profile-page"); }
-function goEventHome(){ switchPage("event-home"); }
-
-function showModal(msg){ modalText.textContent=msg; modal.classList.remove("hidden"); }
-modalConfirm.onclick = ()=> modal.classList.add("hidden");
-
-document.getElementById("save-profile")?.addEventListener("click",()=>{ alert("個人資料已更新"); goEventHome(); });
-document.getElementById("cancel-profile")?.addEventListener("click", goEventHome);
-document.getElementById("cancel-leader")?.addEventListener("click", goEventHome);
-document.getElementById("next-leader")?.addEventListener("click", ()=> switchPage("member-page"));
-document.getElementById("cancel-member")?.addEventListener("click", goEventHome);
-document.getElementById("confirm-member")?.addEventListener("click", ()=> { alert("報名完成"); goEventHome(); });
-</script>
 
 </body>
 </html>
