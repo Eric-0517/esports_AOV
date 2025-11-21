@@ -1,161 +1,122 @@
-// ---------- 全域變數 ----------
 let isLoggedIn = false;
 let username = "訪客";
-let savedProfile = {}; // 必須宣告
+let token = null; // JWT
+let savedProfile = {};
 
 const usernameEl = document.getElementById("username");
 const navRight = document.getElementById("nav-right");
-const modal = document.getElementById("system-modal");
-const modalText = document.getElementById("modal-text");
-const modalConfirm = document.getElementById("modal-confirm");
 
-const clientId = "1403970810762363013";
-const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
-const scope = "identify";
-
-const events = [
-  { name: "AOV 線上賽 - 測試賽事", date: "2025/11/30", signup: "2025/11/20 - 2025/11/25", status: "報名中" }
-];
-
-// ---------- 初始化 ----------
-window.onload = () => {
-
-  // 1. 先取得 token
+window.onload = async () => {
+  // 取得 URL token
   const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
-  if (token) handleToken(token);
-
-  // 2. 再更新 UI
-  updateUserUI();
-
-  // 3. 再畫面內容
-  renderEvents();
-
-  // 4. 再處理 savedProfile
-  document.getElementById('p-discord').textContent = username;
-  const nicknameEl = document.getElementById('p-nickname');
-  const rankEl = document.getElementById('p-rank');
-
-  if(savedProfile){
-    if(savedProfile.nickname){
-      nicknameEl.value = savedProfile.nickname;
-      nicknameEl.disabled = true;
-    }
-    if(savedProfile.rank){
-      rankEl.value = savedProfile.rank;
-      rankEl.disabled = true;
-    }
+  const t = urlParams.get("token");
+  if (t) {
+    token = t;
+    handleToken(token);
+    await loadProfile();
   }
+
+  updateUserUI();
+  renderEvents();
 };
 
-// ---------- 更新 UI ----------
 function updateUserUI() {
   usernameEl.textContent = username;
 
-  const leaderDiscord = document.getElementById("leader-discord");
-  if (leaderDiscord) leaderDiscord.textContent = username;
+  const loginBtnHtml = isLoggedIn ?
+    `<button class="btn-login" onclick="goProfile()">個人資料 / 已報名資訊</button>
+     <button class="btn-login" onclick="logout()">登出</button>` :
+    `<button class="btn-login" id="login-btn">Discord 登入</button>`;
+  navRight.innerHTML = loginBtnHtml;
+  if (!isLoggedIn) document.getElementById("login-btn")?.addEventListener("click", login);
 
-  if (!isLoggedIn) {
-    navRight.innerHTML = `<button class="btn-login" id="login-btn">Discord 登入</button>`;
-    document.getElementById("login-btn").onclick = login;
-  } else {
-    navRight.innerHTML = `
-      <button class="btn-login" onclick="goProfile()">個人資訊/已報名資訊</button>
-      <button class="btn-login" onclick="logout()">登出</button>
-    `;
+  document.getElementById("p-discord").textContent = username;
+  document.getElementById("leader-discord").textContent = username;
+
+  // 遊戲暱稱 / 排位
+  const nicknameInput = document.getElementById("p-nickname");
+  const rankInput = document.getElementById("p-rank");
+  if (savedProfile.nickname) {
+    nicknameInput.value = savedProfile.nickname;
+    nicknameInput.disabled = true;
+  }
+  if (savedProfile.rank) {
+    rankInput.value = savedProfile.rank;
+    rankInput.disabled = true;
+  }
+
+  // 其他欄位
+  ["p-realname","p-phone","p-email","p-birthday","p-taiwan","p-id"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && savedProfile[id]) el.value = savedProfile[id];
+  });
+}
+
+// 取得個人資料
+async function loadProfile() {
+  try {
+    const res = await fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } });
+    if (res.ok) savedProfile = await res.json();
+    else savedProfile = {};
+  } catch(err) {
+    console.error(err);
+    savedProfile = {};
   }
 }
 
-// ---------- Discord OAuth ----------
-function login() {
-  const oauthUrl =
-    `https://discord.com/oauth2/authorize` +
-    `?client_id=${clientId}` +
-    `&redirect_uri=${encodeURIComponent(backendCallback)}` +
-    `&response_type=code` +
-    `&scope=${encodeURIComponent(scope)}`;
-  window.location.href = oauthUrl;
-}
+// 儲存個人資料
+document.getElementById("save-profile")?.addEventListener("click", async () => {
+  const data = {
+    nickname: document.getElementById("p-nickname").value,
+    rank: document.getElementById("p-rank").value,
+    realname: document.getElementById("p-realname").value,
+    phone: document.getElementById("p-phone").value,
+    email: document.getElementById("p-email").value,
+    birthday: document.getElementById("p-birthday").value,
+    taiwan: document.getElementById("p-taiwan").value,
+    idNumber: document.getElementById("p-id").value
+  };
 
+  try {
+    const res = await fetch("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      savedProfile = await res.json();
+      alert("個人資料已儲存");
+      updateUserUI();
+      goEventHome();
+    } else alert("儲存失敗");
+  } catch(err) {
+    console.error(err);
+    alert("儲存失敗");
+  }
+});
+
+// 登入 / 登出
+function login() {
+  window.location.href =
+    `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(backendCallback)}&response_type=code&scope=${encodeURIComponent(scope)}`;
+}
 function logout() {
   isLoggedIn = false;
   username = "訪客";
+  token = null;
+  savedProfile = {};
   switchPage("event-home");
   updateUserUI();
 }
 
-// ---------- token 解析 ----------
-function handleToken(token) {
+function handleToken(t) {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = JSON.parse(atob(t.split('.')[1]));
     username = payload.username || "Discord使用者";
     isLoggedIn = true;
-
-    updateUserUI();
-
-    // 清除 URL token
-    history.replaceState(null, "", "register-system.html");
-  } catch (err) {
-    console.error("JWT 解析錯誤:", err);
+  } catch(err) {
+    console.error(err);
+    username = "訪客";
+    isLoggedIn = false;
   }
 }
-
-// ---------- 頁面切換 ----------
-function switchPage(pageId) {
-  const pages = ["event-home","profile-page","leader-page","member-page"];
-  pages.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-
-  const target = document.getElementById(pageId);
-  if (target) target.style.display = "block";
-}
-
-// ---------- 賽事列表 ----------
-function renderEvents() {
-  const list = document.getElementById("event-list");
-  const noEvent = document.getElementById("no-event");
-  list.innerHTML = "";
-  if(events.length===0){
-    noEvent.classList.remove("hidden");
-    return;
-  } else {
-    noEvent.classList.add("hidden");
-  }
-  events.forEach(ev=>{
-    const div = document.createElement("div");
-    div.className = "event-card";
-    div.innerHTML = `
-      <div class="event-name">${ev.name}</div>
-      <div class="event-info">比賽日期：${ev.date}</div>
-      <div class="event-info">報名時間：${ev.signup}</div>
-      <div class="event-info">狀態：${ev.status}</div>
-      <div class="card-btn-row">
-        <div class="card-btn" onclick="goSignup('team')">團體報名</div>
-        <div class="card-btn" onclick="goSignup('solo')">個人報名</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// ---------- 報名 ----------
-function goSignup(type){
-  if(!isLoggedIn){ showModal("請先登入 Discord"); return; }
-  type==="team" ? switchPage("leader-page") : switchPage("member-page");
-}
-
-function goProfile(){
-  if(!isLoggedIn){ showModal("請先登入 Discord"); return; }
-  switchPage("profile-page");
-}
-
-function goEventHome(){ switchPage("event-home"); }
-
-// ---------- Modal ----------
-function showModal(msg){
-  modalText.textContent = msg;
-  modal.classList.remove("hidden");
-}
-modalConfirm.onclick = () => modal.classList.add("hidden");
