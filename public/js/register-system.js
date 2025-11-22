@@ -2,7 +2,7 @@
 // ---------- 全域變數 ----------
 let isLoggedIn = false;
 let username = "訪客";
-let savedProfile = {}; // 儲存已填寫資料
+let savedProfile = {};
 let token = null;
 
 const usernameEl = document.getElementById("username");
@@ -109,7 +109,7 @@ function logout() {
   clearTimeout(idleTimer);
 }
 
-// ---------- 處理 JWT ----------
+// ---------- JWT ----------
 function handleToken(t) {
   try {
     const payload = JSON.parse(atob(t.split('.')[1]));
@@ -127,8 +127,7 @@ function switchPage(pageId) {
     const el = document.getElementById(id); 
     if(el) el.style.display="none"; 
   });
-  const target = document.getElementById(pageId);
-  if(target) target.style.display="block";
+  document.getElementById(pageId).style.display = "block";
 }
 
 // ---------- Modal ----------
@@ -174,8 +173,7 @@ function renderEvents() {
       <div class="event-info">報名時間：${ev.signup}</div>
       <div class="event-info">狀態：${ev.status}</div>
       <div class="card-btn-row">
-        <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'team\')':''}">團體報名</div>
-        <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'solo\')':''}">個人報名</div>
+        <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'team\')':''}">前往報名</div>
         <div class="card-btn ${btnScheduleClass}" onclick="${ev.hasSchedule?'window.open(\'/schedule\',\'_blank\')':''}">賽程表</div>
       </div>
     `;
@@ -183,7 +181,7 @@ function renderEvents() {
   });
 }
 
-// ---------- 報名 & 個人頁 ----------
+// ---------- 報名 ----------
 function goSignup(type){
   if(!isLoggedIn){
     showModal("請先登入 Discord");
@@ -191,6 +189,7 @@ function goSignup(type){
   }
   type === "team" ? switchPage("leader-page") : switchPage("member-page");
 }
+
 function goProfile(){
   if(!isLoggedIn){
     showModal("請先登入 Discord");
@@ -198,6 +197,7 @@ function goProfile(){
   }
   switchPage("profile-page");
 }
+
 function goEventHome(){
   switchPage("event-home");
 }
@@ -218,7 +218,7 @@ async function loadProfile() {
   }
 }
 
-// ---------- 儲存個人資料 ----------
+// ---------- 儲存資料 ----------
 async function saveProfile() {
   const data = {
     nickname: document.getElementById("p-nickname").value,
@@ -261,7 +261,7 @@ async function saveProfile() {
 }
 
 // =======================
-// ▶ 未操作自動登出（5 分鐘）
+// ▶ 5 分鐘未操作自動登出
 // =======================
 let idleTimer = null;
 const MAX_IDLE_TIME = 5 * 60 * 1000;
