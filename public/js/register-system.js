@@ -1,3 +1,4 @@
+<script>
 // ---------- 全域變數 ----------
 let isLoggedIn = false;
 let username = "訪客";
@@ -17,28 +18,22 @@ const scope = "identify";
 
 // ---------- 初始化 ----------
 window.onload = async () => {
-  // 取得 URL token
   const urlParams = new URLSearchParams(window.location.search);
   token = urlParams.get("token");
 
-  // 若 URL 內有 token → 儲存到 localStorage
   if (token) {
     localStorage.setItem("auth_token", token);
     handleToken(token);
     history.replaceState(null, "", "register-system.html");
   } else {
-    // 沒 token → 從 localStorage 讀取（保持登入狀態）
     token = localStorage.getItem("auth_token");
     if (token) handleToken(token);
   }
 
-  // 載入已填寫資料
   await loadProfile();
-
   updateUserUI();
   renderEvents();
 
-  // ---------- 綁定按鈕事件 ----------
   document.getElementById("save-profile")?.addEventListener("click", saveProfile);
   document.getElementById("cancel-profile")?.addEventListener("click", goEventHome);
   document.getElementById("cancel-leader")?.addEventListener("click", goEventHome);
@@ -49,7 +44,6 @@ window.onload = async () => {
     goEventHome(); 
   });
 
-  // 🚨 啟動 5 分鐘未操作自動登出
   startIdleTimer();
 };
 
@@ -57,11 +51,9 @@ window.onload = async () => {
 function updateUserUI() {
   usernameEl.textContent = username;
 
-  // 隊長頁：自動帶入 Discord 名稱
   const leaderDiscord = document.getElementById("leader-discord");
   if (leaderDiscord) leaderDiscord.textContent = username;
 
-  // 導覽列
   if (!isLoggedIn) {
     navRight.innerHTML = `<button class="btn-login" id="login-btn">Discord 登入</button>`;
     document.getElementById("login-btn").onclick = login;
@@ -73,20 +65,15 @@ function updateUserUI() {
     document.getElementById("logout-btn").onclick = logout;
   }
 
-  // 個人資料頁：Discord 帳號
   const discordSpan = document.getElementById("p-discord");
   if (discordSpan) discordSpan.textContent = username;
 
-  // 已填寫的資料帶入
-  const fields = [
-    "realname", "phone", "email", "birthday", "taiwan", "idNumber"
-  ];
+  const fields = ["realname", "phone", "email", "birthday", "taiwan", "idNumber"];
   fields.forEach(f => {
     const el = document.getElementById(`p-${f}`);
     if (el) el.value = savedProfile[f] || "";
   });
 
-  // 個人資料：暱稱、排位（只能填一次）
   const nicknameInput = document.getElementById("p-nickname");
   const rankInput = document.getElementById("p-rank");
 
@@ -117,11 +104,8 @@ function logout() {
   username = "訪客";
   savedProfile = {};
   localStorage.removeItem("auth_token");
-
   switchPage("event-home");
   updateUserUI();
-
-  // 停止自動登出計時
   clearTimeout(idleTimer);
 }
 
@@ -154,62 +138,7 @@ function showModal(msg){
 }
 modalConfirm.onclick = () => modal.classList.add("hidden");
 
-<style>
-  .event-card {
-    background: #0C0E12;
-    padding: 16px;
-    margin-bottom: 16px;
-    border-radius: 12px;
-    box-shadow: 0 0 8px rgba(0, 247, 255, 0.1);
-    color: #fff;
-  }
-
-  .event-name {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-
-  .event-info {
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  .card-btn-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  .card-btn {
-    flex: 1;
-    text-align: center;
-    padding: 8px 0;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-    user-select: none;
-  }
-
-  .btn-active {
-    background-color: #6F4ACD;
-    color: #fff;
-  }
-
-  .btn-disabled {
-    background-color: #C0BFBC;
-    color: #fff;
-    cursor: not-allowed;
-  }
-
-  .card-btn:hover.btn-active {
-    background-color: #5838b0;
-  }
-</style>
-
-<script>
+// ---------- Render Events ----------
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
@@ -220,28 +149,24 @@ function renderEvents() {
       name: "AOV 線上賽 - 測試賽事", 
       date: "2025/11/30", 
       signup: "2025/11/20 - 2025/11/25", 
-      status: "報名中", // 可改成 '報名結束'
-      hasSchedule: true // true: 有賽程表, false: 無賽程表
+      status: "報名中",
+      hasSchedule: true
     }
   ];
 
-  if(events.length === 0){
+  if (events.length === 0) {
     noEvent.classList.remove("hidden");
     return;
   } else {
     noEvent.classList.add("hidden");
   }
 
-  events.forEach(ev=>{
+  events.forEach(ev => {
     const div = document.createElement("div");
     div.className = "event-card";
-    
-    // 按鈕狀態
-    const btnSignupClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
-    const btnSignupText = ev.status === "報名中" ? "前往報名" : "報名結束";
 
+    const btnSignupClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
     const btnScheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
-    const btnScheduleText = ev.hasSchedule ? "賽程表" : "賽程表";
 
     div.innerHTML = `
       <div class="event-name">${ev.name}</div>
@@ -251,13 +176,12 @@ function renderEvents() {
       <div class="card-btn-row">
         <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'team\')':''}">團體報名</div>
         <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'solo\')':''}">個人報名</div>
-        <div class="card-btn ${btnScheduleClass}" onclick="${ev.hasSchedule?'window.open(\'/schedule\',\'_blank\')':''}">${btnScheduleText}</div>
+        <div class="card-btn ${btnScheduleClass}" onclick="${ev.hasSchedule?'window.open(\'/schedule\',\'_blank\')':''}">賽程表</div>
       </div>
     `;
     list.appendChild(div);
   });
 }
-</script>
 
 // ---------- 報名 & 個人頁 ----------
 function goSignup(type){
@@ -340,7 +264,7 @@ async function saveProfile() {
 // ▶ 未操作自動登出（5 分鐘）
 // =======================
 let idleTimer = null;
-const MAX_IDLE_TIME = 5 * 60 * 1000; // 5 分鐘
+const MAX_IDLE_TIME = 5 * 60 * 1000;
 
 function resetIdleTimer() {
   clearTimeout(idleTimer);
@@ -360,3 +284,4 @@ function startIdleTimer() {
 
   resetIdleTimer();
 }
+</script>
