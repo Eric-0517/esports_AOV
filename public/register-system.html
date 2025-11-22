@@ -9,7 +9,6 @@
 
 <!-- JS -->
 <script src="js/register-system.js" defer></script>
-
 </head>
 <body>
 
@@ -24,7 +23,7 @@
     親愛的 <span id="username" class="username visitor">訪客</span> 你好
   </div>
   <div class="nav-right" id="nav-right">
-    <button class="btn-login" id="login-btn">Discord 登入</button>
+    <!-- Discord 登入按鈕由 JS 動態生成 -->
   </div>
 </nav>
 
@@ -33,211 +32,10 @@
   <h2 class="event-title">最新賽事資訊</h2>
   <div id="event-list" class="event-list"></div>
   <p id="no-event" class="no-event hidden">近期尚未舉辦任何賽事！</p>
-
-  <style>
-    .event-card {
-      background: #0C0E12;
-      padding: 16px;
-      margin-bottom: 16px;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0, 247, 255, 0.1);
-      color: #fff;
-    }
-
-    .event-name {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .event-info {
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .card-btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .card-btn {
-      flex: 1;
-      text-align: center;
-      padding: 8px 0;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      transition: 0.2s;
-    }
-
-    .btn-active {
-      background-color: #6F4ACD;
-      color: #fff;
-    }
-
-    .btn-active:hover {
-      background-color: #5838b0;
-    }
-
-    .btn-disabled {
-      background-color: #C0BFBC;
-      color: #fff;
-      cursor: not-allowed;
-    }
-  </style>
-
-  <script>
-    function renderEvents() {
-      const list = document.getElementById("event-list");
-      const noEvent = document.getElementById("no-event");
-      list.innerHTML = "";
-
-      const events = [
-        { 
-          name: "AOV 線上賽 - 測試賽事", 
-          date: "2025/11/30", 
-          signup: "2025/11/20 - 2025/11/25", 
-          status: "報名中", 
-          hasSchedule: true 
-        },
-        { 
-          name: "AOV 線上賽 - 測試賽事2", 
-          date: "2025/12/05", 
-          signup: "2025/11/25 - 2025/11/30", 
-          status: "報名結束",
-          hasSchedule: false
-        }
-      ];
-
-      if(events.length === 0){
-        noEvent.classList.remove("hidden");
-        return;
-      } else {
-        noEvent.classList.add("hidden");
-      }
-
-      events.forEach(ev => {
-        const div = document.createElement("div");
-        div.className = "event-card";
-
-        const btnClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
-        const btnText = ev.status === "報名中" ? "前往報名" : "報名結束";
-        const scheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
-
-        div.innerHTML = `
-          <div class="event-name">${ev.name}</div>
-          <div class="event-info">比賽日期：${ev.date}</div>
-          <div class="event-info">報名時間：${ev.signup}</div>
-          <div class="event-info">狀態：${ev.status}</div>
-          <div class="card-btn-row">
-            <div class="card-btn ${btnClass}" onclick="${ev.status==='報名中'?'goSignup(\'team\')':''}">${btnText}</div>
-            <div class="card-btn ${scheduleClass}" onclick="${ev.hasSchedule?'window.open(\'/schedule\',\'_blank\')':''}">賽程表</div>
-          </div>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    renderEvents();
-  </script>
 </section>
-
 
 <!-- 個人資料頁 -->
 <section id="profile-page" class="player-section page-section hidden">
-
-  <style>
-    /* 整體容器 */
-    .profile-form {
-      width: 90%;
-      max-width: 480px;
-      margin: 20px auto;
-      background: #0C0E12;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 247, 255, 0.1);
-    }
-
-    /* 每一列 */
-    .info-row {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 16px;
-    }
-
-    .info-row label {
-      color: #8BD9FF;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    /* 輸入框、下拉選單 */
-    .info-row input,
-    .info-row select {
-      padding: 10px;
-      font-size: 15px;
-      border: 1px solid #2FD6FA; /* 藍色框線 */
-      border-radius: 5px;
-      background: #0F1117;
-      color: #fff;
-      outline: none;
-      transition: 0.2s;
-    }
-
-    .info-row input:focus,
-    .info-row select:focus {
-      border-color: #6F4ACD;
-      box-shadow: 0 0 5px rgba(111, 74, 205, 0.6);
-    }
-
-    /* 遊戲暱稱 & 遊戲排位：灰色文字 */
-    #p-nickname,
-    #p-rank {
-      color: #b3b3b3;
-    }
-
-    #p-nickname:disabled,
-    #p-rank:disabled {
-      color: #8e8e8e;
-      background: #14161c;
-      border: 1px solid #3aaee0;
-    }
-
-    /* 按鈕列 */
-    .btn-row {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    /* 取消 / 完成按鈕 */
-    #cancel-profile,
-    #save-profile {
-      padding: 12px 24px;
-      background: #6F4ACD; /* 電競紫 */
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 15px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    #cancel-profile:hover,
-    #save-profile:hover {
-      background: #5838b0;
-    }
-
-    #cancel-profile:active,
-    #save-profile:active {
-      transform: scale(0.95);
-    }
-  </style>
-
   <h2 class="player-title">個人資料</h2>
 
   <div class="profile-form">
@@ -295,13 +93,12 @@
     <button id="save-profile">完成</button>
   </div>
 </section>
-  
-  <div class="divide-line"></div>
-  <h3>已報名賽事</h3>
-  <div id="joined-events" class="joined-events-list"></div>
-  <p id="no-joined" class="no-event hidden">尚無已報名賽事</p>
 
-</section>
+<!-- 已報名賽事 -->
+<div class="divide-line"></div>
+<h3>已報名賽事</h3>
+<div id="joined-events" class="joined-events-list"></div>
+<p id="no-joined" class="no-event hidden">尚無已報名賽事</p>
 
 <!-- 隊長報名頁 -->
 <section id="leader-page" class="player-section page-section hidden">
