@@ -32,8 +32,9 @@ window.onload = async () => {
 
   await loadProfile();
   updateUserUI();
-  renderEvents();
+  await renderEvents();
 
+  // 綁定按鈕事件
   document.getElementById("save-profile")?.addEventListener("click", saveProfile);
   document.getElementById("cancel-profile")?.addEventListener("click", goEventHome);
   document.getElementById("cancel-leader")?.addEventListener("click", goEventHome);
@@ -54,15 +55,27 @@ function updateUserUI() {
   const leaderDiscord = document.getElementById("leader-discord");
   if (leaderDiscord) leaderDiscord.textContent = username;
 
+  // 清空 navRight
+  navRight.innerHTML = "";
+  
   if (!isLoggedIn) {
-    navRight.innerHTML = `<button class="btn-login" id="login-btn">Discord 登入</button>`;
-    document.getElementById("login-btn").onclick = login;
+    const loginBtn = document.createElement("button");
+    loginBtn.className = "btn-login";
+    loginBtn.textContent = "Discord 登入";
+    loginBtn.addEventListener("click", login);
+    navRight.appendChild(loginBtn);
   } else {
-    navRight.innerHTML = `
-      <button class="btn-login" onclick="goProfile()">個人資料 / 已報名資訊</button>
-      <button class="btn-login" id="logout-btn">登出</button>
-    `;
-    document.getElementById("logout-btn").onclick = logout;
+    const profileBtn = document.createElement("button");
+    profileBtn.className = "btn-login";
+    profileBtn.textContent = "個人資料 / 已報名資訊";
+    profileBtn.addEventListener("click", goProfile);
+    navRight.appendChild(profileBtn);
+
+    const logoutBtn = document.createElement("button");
+    logoutBtn.className = "btn-login";
+    logoutBtn.textContent = "登出";
+    logoutBtn.addEventListener("click", logout);
+    navRight.appendChild(logoutBtn);
   }
 
   const discordSpan = document.getElementById("p-discord");
@@ -135,9 +148,9 @@ function showModal(msg){
   modalText.textContent = msg;
   modal.classList.remove("hidden");
 }
-modalConfirm.onclick = () => modal.classList.add("hidden");
+modalConfirm.addEventListener("click", () => modal.classList.add("hidden"));
 
-// ---------- Render Events (讀 JSON 版) ----------
+// ---------- Render Events (讀 JSON) ----------
 async function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
@@ -174,19 +187,20 @@ async function renderEvents() {
       <div class="event-info">比賽日期：${ev.date}</div>
       <div class="event-info">報名時間：${ev.signup}</div>
       <div class="event-info">狀態：${ev.status}</div>
-
       <div class="card-btn-row">
-        <div class="card-btn ${btnSignupClass}" 
-             onclick="${ev.status === '報名中' ? `goSignup('team')` : ''}">
-          前往報名
-        </div>
-
-        <div class="card-btn ${btnScheduleClass}"
-             onclick="${ev.hasSchedule ? `window.open('/schedule/${ev.id}', '_blank')` : ''}">
-          賽程表
-        </div>
+        <div class="card-btn ${btnSignupClass}">前往報名</div>
+        <div class="card-btn ${btnScheduleClass}">賽程表</div>
       </div>
     `;
+
+    const signupBtn = div.querySelector(".card-btn:nth-child(1)");
+    if (ev.status === "報名中") signupBtn.addEventListener("click", () => goSignup("team"));
+
+    const scheduleBtn = div.querySelector(".card-btn:nth-child(2)");
+    if (ev.hasSchedule) scheduleBtn.addEventListener("click", () => {
+      window.open(`/schedule/${ev.id}`, "_blank");
+    });
+
     list.appendChild(div);
   });
 }
@@ -270,9 +284,7 @@ async function saveProfile() {
   }
 }
 
-// =======================
-// ▶ 5 分鐘未操作自動登出
-// =======================
+// 5 分鐘未操作自動登出
 let idleTimer = null;
 const MAX_IDLE_TIME = 5 * 60 * 1000;
 
