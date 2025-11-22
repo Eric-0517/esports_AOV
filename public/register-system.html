@@ -7,7 +7,7 @@
 <!-- CSS -->
 <link rel="stylesheet" href="css/register-system.css">
 
-<!-- ❗ 只保留一份 JS，避免重複宣告 -->
+<!-- JS -->
 <script src="js/register-system.js" defer></script>
 
 </head>
@@ -37,51 +37,47 @@
 
 <!-- 個人資料頁 -->
 <section id="profile-page" class="player-section page-section hidden">
-  <div class="player-nav">
-    <button class="btn-back" id="back-home">回賽事首頁</button>
-    <button class="btn-logout" id="logout-btn">登出</button>
-  </div>
 
   <h2 class="player-title">個人資料</h2>
 
   <div class="profile-form">
     <div class="info-row">
-      <label for="p-discord">Discord 名稱：</label>
+      <label>Discord 名稱：</label>
       <span id="p-discord"></span>
     </div>
 
     <div class="info-row">
-      <label for="p-nickname">遊戲暱稱：</label>
-      <input type="text" id="p-nickname" placeholder="輸入遊戲暱稱">
+      <label>遊戲暱稱：</label>
+      <input type="text" id="p-nickname">
     </div>
 
     <div class="info-row">
-      <label for="p-rank">遊戲排位：</label>
-      <input type="text" id="p-rank" placeholder="輸入遊戲排位">
+      <label>遊戲排位：</label>
+      <input type="text" id="p-rank">
     </div>
 
     <div class="info-row">
-      <label for="p-realname">真實姓名：</label>
-      <input type="text" id="p-realname" placeholder="輸入真實姓名">
+      <label>真實姓名：</label>
+      <input type="text" id="p-realname">
     </div>
 
     <div class="info-row">
-      <label for="p-phone">連絡電話：</label>
-      <input type="text" id="p-phone" placeholder="輸入連絡電話">
+      <label>連絡電話：</label>
+      <input type="text" id="p-phone">
     </div>
 
     <div class="info-row">
-      <label for="p-email">電子信箱：</label>
-      <input type="email" id="p-email" placeholder="輸入電子信箱">
+      <label>電子信箱：</label>
+      <input type="email" id="p-email">
     </div>
 
     <div class="info-row">
-      <label for="p-birthday">生日：</label>
+      <label>生日：</label>
       <input type="date" id="p-birthday">
     </div>
 
     <div class="info-row">
-      <label for="p-taiwan">是否居住台灣：</label>
+      <label>是否居住台灣：</label>
       <select id="p-taiwan">
         <option value="是">是</option>
         <option value="否">否</option>
@@ -89,8 +85,8 @@
     </div>
 
     <div class="info-row">
-      <label for="p-id">身分證字號：</label>
-      <input type="text" id="p-id" placeholder="輸入身分證字號">
+      <label>身分證字號：</label>
+      <input type="text" id="p-id">
     </div>
   </div>
 
@@ -103,12 +99,13 @@
   <h3>已報名賽事</h3>
   <div id="joined-events" class="joined-events-list"></div>
   <p id="no-joined" class="no-event hidden">尚無已報名賽事</p>
+
 </section>
 
 <!-- 隊長報名頁 -->
 <section id="leader-page" class="player-section page-section hidden">
   <div class="player-nav">
-    <button class="btn-back" id="back-home-leader">取消</button>
+    <button class="btn-back" id="cancel-leader">取消</button>
   </div>
   <h2 class="player-title">隊長報名</h2>
   <p>隊長資訊由登入帳號自動帶入</p>
@@ -123,7 +120,7 @@
 <!-- 隊員報名頁 -->
 <section id="member-page" class="player-section page-section hidden">
   <div class="player-nav">
-    <button class="btn-back" id="back-home-member">取消</button>
+    <button class="btn-back" id="cancel-member">取消</button>
   </div>
   <h2 class="player-title">隊員報名</h2>
   <p>玩家序號由系統生成</p>
@@ -136,7 +133,7 @@
 <div id="system-modal" class="modal hidden">
   <div class="modal-content">
     <h3 class="modal-title">系統通知</h3>
-    <p id="modal-text">請先登入</p>
+    <p id="modal-text"></p>
     <button id="modal-confirm">確認</button>
   </div>
 </div>
