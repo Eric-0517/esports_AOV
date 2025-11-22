@@ -68,7 +68,7 @@
     .info-row select {
       padding: 10px;
       font-size: 15px;
-      border: 1px solid #2FD6FA; /* ✔ 藍色框線 */
+      border: 1px solid #2FD6FA; /* 藍色框線 */
       border-radius: 5px;
       background: #0F1117;
       color: #fff;
@@ -80,6 +80,19 @@
     .info-row select:focus {
       border-color: #6F4ACD;
       box-shadow: 0 0 5px rgba(111, 74, 205, 0.6);
+    }
+
+    /* 遊戲暱稱 & 遊戲排位：灰色文字 */
+    #p-nickname,
+    #p-rank {
+      color: #b3b3b3;
+    }
+
+    #p-nickname:disabled,
+    #p-rank:disabled {
+      color: #8e8e8e;
+      background: #14161c;
+      border: 1px solid #3aaee0;
     }
 
     /* 按鈕列 */
@@ -94,7 +107,7 @@
     #cancel-profile,
     #save-profile {
       padding: 12px 24px;
-      background: #6F4ACD; /* ✔ 指定電競紫 */
+      background: #6F4ACD; /* 電競紫 */
       border: none;
       border-radius: 8px;
       color: #fff;
@@ -171,7 +184,7 @@
     <button id="save-profile">完成</button>
   </div>
 </section>
-
+  
   <div class="divide-line"></div>
   <h3>已報名賽事</h3>
   <div id="joined-events" class="joined-events-list"></div>
