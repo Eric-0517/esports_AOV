@@ -45,6 +45,10 @@ window.onload = async () => {
     goEventHome(); 
   });
 
+  // 綁定 Discord 登入按鈕（固定綁在 HTML 原按鈕）
+  const loginBtn = document.getElementById("login-btn");
+  if(loginBtn) loginBtn.addEventListener("click", login);
+
   startIdleTimer();
 };
 
@@ -55,27 +59,32 @@ function updateUserUI() {
   const leaderDiscord = document.getElementById("leader-discord");
   if (leaderDiscord) leaderDiscord.textContent = username;
 
-  // 清空 navRight
-  navRight.innerHTML = "";
-  
-  if (!isLoggedIn) {
-    const loginBtn = document.createElement("button");
-    loginBtn.className = "btn-login";
-    loginBtn.textContent = "Discord 登入";
-    loginBtn.addEventListener("click", login);
-    navRight.appendChild(loginBtn);
-  } else {
-    const profileBtn = document.createElement("button");
-    profileBtn.className = "btn-login";
-    profileBtn.textContent = "個人資料 / 已報名資訊";
-    profileBtn.addEventListener("click", goProfile);
-    navRight.appendChild(profileBtn);
+  const loginBtn = document.getElementById("login-btn");
+  if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 
-    const logoutBtn = document.createElement("button");
-    logoutBtn.className = "btn-login";
-    logoutBtn.textContent = "登出";
-    logoutBtn.addEventListener("click", logout);
-    navRight.appendChild(logoutBtn);
+  // 如果已登入，顯示個人資料 / 登出按鈕
+  if(isLoggedIn){
+    if(!document.getElementById("profile-btn")){
+      const profileBtn = document.createElement("button");
+      profileBtn.id = "profile-btn";
+      profileBtn.className = "btn-login";
+      profileBtn.textContent = "個人資料 / 已報名資訊";
+      profileBtn.addEventListener("click", goProfile);
+      navRight.appendChild(profileBtn);
+
+      const logoutBtn = document.createElement("button");
+      logoutBtn.id = "logout-btn";
+      logoutBtn.className = "btn-login";
+      logoutBtn.textContent = "登出";
+      logoutBtn.addEventListener("click", logout);
+      navRight.appendChild(logoutBtn);
+    }
+  } else {
+    // 登出狀態移除按鈕
+    const profileBtn = document.getElementById("profile-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    if(profileBtn) profileBtn.remove();
+    if(logoutBtn) logoutBtn.remove();
   }
 
   const discordSpan = document.getElementById("p-discord");
