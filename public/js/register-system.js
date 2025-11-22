@@ -48,6 +48,9 @@ window.onload = async () => {
     alert("報名完成"); 
     goEventHome(); 
   });
+
+  // 🚨 啟動 5 分鐘未操作自動登出
+  startIdleTimer();
 };
 
 // ---------- 更新 UI ----------
@@ -114,8 +117,12 @@ function logout() {
   username = "訪客";
   savedProfile = {};
   localStorage.removeItem("auth_token");
+
   switchPage("event-home");
   updateUserUI();
+
+  // 停止自動登出計時
+  clearTimeout(idleTimer);
 }
 
 // ---------- 處理 JWT ----------
@@ -256,4 +263,29 @@ async function saveProfile() {
     console.error(err);
     alert("儲存失敗");
   }
+}
+
+// =======================
+// ▶ 未操作自動登出（5 分鐘）
+// =======================
+let idleTimer = null;
+const MAX_IDLE_TIME = 5 * 60 * 1000; // 5 分鐘
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+
+  if (!isLoggedIn) return;
+
+  idleTimer = setTimeout(() => {
+    showModal("登入失敗或已過期，請重新登入");
+    logout();
+  }, MAX_IDLE_TIME);
+}
+
+function startIdleTimer() {
+  ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+    document.addEventListener(evt, resetIdleTimer);
+  });
+
+  resetIdleTimer();
 }
