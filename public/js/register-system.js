@@ -154,14 +154,75 @@ function showModal(msg){
 }
 modalConfirm.onclick = () => modal.classList.add("hidden");
 
-// ---------- 假賽事列表 ----------
+<style>
+  .event-card {
+    background: #0C0E12;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 247, 255, 0.1);
+    color: #fff;
+  }
+
+  .event-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .event-info {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .card-btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .card-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+  }
+
+  .btn-active {
+    background-color: #6F4ACD;
+    color: #fff;
+  }
+
+  .btn-disabled {
+    background-color: #C0BFBC;
+    color: #fff;
+    cursor: not-allowed;
+  }
+
+  .card-btn:hover.btn-active {
+    background-color: #5838b0;
+  }
+</style>
+
+<script>
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
   list.innerHTML = "";
 
   const events = [
-    { name: "AOV 線上賽 - 測試賽事", date: "2025/11/30", signup: "2025/11/20 - 2025/11/25", status: "報名中" }
+    { 
+      name: "AOV 線上賽 - 測試賽事", 
+      date: "2025/11/30", 
+      signup: "2025/11/20 - 2025/11/25", 
+      status: "報名中", // 可改成 '報名結束'
+      hasSchedule: true // true: 有賽程表, false: 無賽程表
+    }
   ];
 
   if(events.length === 0){
@@ -172,21 +233,31 @@ function renderEvents() {
   }
 
   events.forEach(ev=>{
-    const div=document.createElement("div");
-    div.className="event-card";
-    div.innerHTML=`
+    const div = document.createElement("div");
+    div.className = "event-card";
+    
+    // 按鈕狀態
+    const btnSignupClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
+    const btnSignupText = ev.status === "報名中" ? "前往報名" : "報名結束";
+
+    const btnScheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
+    const btnScheduleText = ev.hasSchedule ? "賽程表" : "賽程表";
+
+    div.innerHTML = `
       <div class="event-name">${ev.name}</div>
       <div class="event-info">比賽日期：${ev.date}</div>
       <div class="event-info">報名時間：${ev.signup}</div>
       <div class="event-info">狀態：${ev.status}</div>
       <div class="card-btn-row">
-        <div class="card-btn" onclick="goSignup('team')">團體報名</div>
-        <div class="card-btn" onclick="goSignup('solo')">個人報名</div>
+        <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'team\')':''}">團體報名</div>
+        <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'solo\')':''}">個人報名</div>
+        <div class="card-btn ${btnScheduleClass}" onclick="${ev.hasSchedule?'window.open(\'/schedule\',\'_blank\')':''}">${btnScheduleText}</div>
       </div>
     `;
     list.appendChild(div);
   });
 }
+</script>
 
 // ---------- 報名 & 個人頁 ----------
 function goSignup(type){
