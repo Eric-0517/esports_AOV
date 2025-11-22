@@ -38,6 +38,82 @@
 <!-- 個人資料頁 -->
 <section id="profile-page" class="player-section page-section hidden">
 
+  <style>
+    /* 整體容器 */
+    .profile-form {
+      width: 90%;
+      max-width: 480px;
+      margin: 20px auto;
+      background: #0C0E12;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 247, 255, 0.1);
+    }
+
+    /* 每一列 */
+    .info-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+
+    .info-row label {
+      color: #8BD9FF;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    /* 輸入框、下拉選單 */
+    .info-row input,
+    .info-row select {
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #2FD6FA; /* ✔ 藍色框線 */
+      border-radius: 5px;
+      background: #0F1117;
+      color: #fff;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .info-row input:focus,
+    .info-row select:focus {
+      border-color: #6F4ACD;
+      box-shadow: 0 0 5px rgba(111, 74, 205, 0.6);
+    }
+
+    /* 按鈕列 */
+    .btn-row {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    /* 取消 / 完成按鈕 */
+    #cancel-profile,
+    #save-profile {
+      padding: 12px 24px;
+      background: #6F4ACD; /* ✔ 指定電競紫 */
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #cancel-profile:hover,
+    #save-profile:hover {
+      background: #5838b0;
+    }
+
+    #cancel-profile:active,
+    #save-profile:active {
+      transform: scale(0.95);
+    }
+  </style>
+
   <h2 class="player-title">個人資料</h2>
 
   <div class="profile-form">
@@ -94,6 +170,7 @@
     <button id="cancel-profile">取消</button>
     <button id="save-profile">完成</button>
   </div>
+</section>
 
   <div class="divide-line"></div>
   <h3>已報名賽事</h3>
