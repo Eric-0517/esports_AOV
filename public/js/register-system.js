@@ -137,23 +137,25 @@ function showModal(msg){
 }
 modalConfirm.onclick = () => modal.classList.add("hidden");
 
-// ---------- Render Events ----------
-function renderEvents() {
+// ---------- Render Events (讀 JSON 版) ----------
+async function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
   list.innerHTML = "";
 
-  const events = [
-    { 
-      name: "AOV 線上賽 - 測試賽事", 
-      date: "2025/11/30", 
-      signup: "2025/11/20 - 2025/11/25", 
-      status: "報名中",
-      hasSchedule: true
-    }
-  ];
+  let events = [];
 
-  if (events.length === 0) {
+  try {
+    const res = await fetch("/events.json");
+    if (!res.ok) throw new Error("JSON 讀取失敗");
+    events = await res.json();
+  } catch (err) {
+    console.error("載入賽事列表錯誤:", err);
+    noEvent.classList.remove("hidden");
+    return;
+  }
+
+  if (!events || events.length === 0) {
     noEvent.classList.remove("hidden");
     return;
   } else {
@@ -172,9 +174,17 @@ function renderEvents() {
       <div class="event-info">比賽日期：${ev.date}</div>
       <div class="event-info">報名時間：${ev.signup}</div>
       <div class="event-info">狀態：${ev.status}</div>
+
       <div class="card-btn-row">
-        <div class="card-btn ${btnSignupClass}" onclick="${ev.status==='報名中'?'goSignup(\'team\')':''}">前往報名</div>
-        <div class="card-btn ${btnScheduleClass}" onclick="${ev.hasSchedule?'window.open(\'/schedule\',\'_blank\')':''}">賽程表</div>
+        <div class="card-btn ${btnSignupClass}" 
+             onclick="${ev.status === '報名中' ? `goSignup('team')` : ''}">
+          前往報名
+        </div>
+
+        <div class="card-btn ${btnScheduleClass}"
+             onclick="${ev.hasSchedule ? `window.open('/schedule/${ev.id}', '_blank')` : ''}">
+          賽程表
+        </div>
       </div>
     `;
     list.appendChild(div);
