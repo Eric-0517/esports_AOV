@@ -17,7 +17,7 @@ const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
 const scope = "identify";
 
 // ---------- 初始化 ----------
-window.onload = async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   token = urlParams.get("token");
 
@@ -45,12 +45,12 @@ window.onload = async () => {
     goEventHome(); 
   });
 
-  // 綁定 Discord 登入按鈕（固定綁在 HTML 原按鈕）
+  // 綁定 HTML 上的 Discord 登入按鈕
   const loginBtn = document.getElementById("login-btn");
   if(loginBtn) loginBtn.addEventListener("click", login);
 
   startIdleTimer();
-};
+});
 
 // ---------- 更新 UI ----------
 function updateUserUI() {
@@ -62,7 +62,6 @@ function updateUserUI() {
   const loginBtn = document.getElementById("login-btn");
   if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 
-  // 如果已登入，顯示個人資料 / 登出按鈕
   if(isLoggedIn){
     if(!document.getElementById("profile-btn")){
       const profileBtn = document.createElement("button");
@@ -80,7 +79,6 @@ function updateUserUI() {
       navRight.appendChild(logoutBtn);
     }
   } else {
-    // 登出狀態移除按鈕
     const profileBtn = document.getElementById("profile-btn");
     const logoutBtn = document.getElementById("logout-btn");
     if(profileBtn) profileBtn.remove();
@@ -293,7 +291,7 @@ async function saveProfile() {
   }
 }
 
-// 5 分鐘未操作自動登出
+// ---------- 自動登出 ----------
 let idleTimer = null;
 const MAX_IDLE_TIME = 5 * 60 * 1000;
 
