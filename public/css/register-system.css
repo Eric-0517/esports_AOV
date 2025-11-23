@@ -1,3 +1,4 @@
+/* ---------- 全域 ---------- */
 body {
   background: #000;
   color: #fff;
@@ -24,17 +25,17 @@ body {
   color: #15C5FF;
 }
 
-.btn-login {
+.btn-login, .btn-back, .btn-logout {
   background: #FE2078;
   color: #fff;
   padding: 8px 16px;
   border: 2px solid #FE2078;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  border-radius: 4px;
 }
 
-.btn-login:hover {
+.btn-login:hover, .btn-back:hover, .btn-logout:hover {
   opacity: 0.8;
 }
 
@@ -81,17 +82,26 @@ body {
 
 .card-btn {
   flex: 1;
-  background: #2FD6FA;
   padding: 10px;
   text-align: center;
-  color: #000;
   font-weight: bold;
   border-radius: 4px;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.btn-active {
+  background-color: #6F4ACD;
   cursor: pointer;
 }
 
-.card-btn:hover {
+.btn-active:hover {
   opacity: 0.8;
+}
+
+.btn-disabled {
+  background-color: #C1BFBC;
+  cursor: not-allowed;
 }
 
 .no-event {
@@ -112,6 +122,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
@@ -129,12 +140,12 @@ body {
   margin-bottom: 15px;
 }
 
-.modal-text {
+#modal-text {
   color: #fff;
   margin-bottom: 20px;
 }
 
-.modal-btn {
+#modal-confirm {
   background: transparent;
   border: 2px solid #E82D6A;
   color: #E82D6A;
@@ -146,6 +157,8 @@ body {
 .hidden {
   display: none;
 }
+
+/* 個人資料 / 玩家頁面 */
 .player-section {
   padding: 20px;
 }
@@ -157,21 +170,13 @@ body {
   margin-bottom: 10px;
 }
 
-.btn-back, .btn-logout {
-  background: #FE2078;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 .player-title {
   color: #2FD6FA;
   font-size: 26px;
+  margin-bottom: 15px;
 }
 
-.player-info-box p {
+.player-info-box p, .leader-info-box p {
   margin: 6px 0;
 }
 
@@ -180,10 +185,86 @@ body {
   border: 1px solid #2FD6FA;
 }
 
+/* 已報名賽事 */
 .joined-events-list .joined-card {
   background: #111;
   padding: 12px;
   border: 1px solid #2FD6FA;
   margin-bottom: 10px;
   border-radius: 4px;
+}
+
+/* 個人資料表單 */
+.profile-form {
+  width: 90%;
+  max-width: 480px;
+  margin: 20px auto;
+  background: #0C0E12;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,247,255,0.1);
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.info-row label {
+  color: #8BD9FF;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.info-row input, .info-row select {
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #2FD6FA;
+  border-radius: 5px;
+  background: #0F1117;
+  color: #fff;
+  outline: none;
+  transition: 0.2s;
+}
+
+.info-row input:focus, .info-row select:focus {
+  border-color: #6F4ACD;
+  box-shadow: 0 0 5px rgba(111,74,205,0.6);
+}
+
+#p-nickname, #p-rank {
+  color: #b3b3b3;
+}
+
+#p-nickname:disabled, #p-rank:disabled {
+  color: #8e8e8e;
+  background: #14161c;
+  border: 1px solid #3aaee0;
+}
+
+.btn-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#cancel-profile, #save-profile {
+  padding: 12px 24px;
+  background: #6F4ACD;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#cancel-profile:hover, #save-profile:hover {
+  background: #5838b0;
+}
+
+#cancel-profile:active, #save-profile:active {
+  transform: scale(0.95);
 }
