@@ -1,4 +1,4 @@
-// ---------- 全域變數 ----------
+//全域變數
 let isLoggedIn = false;
 let username = "訪客";
 let token = null;
@@ -8,13 +8,13 @@ const clientId = "1403970810762363013";
 const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
 const scope = "identify";
 
-// ---------- OAuth 登入 ----------
+//OAuth 登入
 function login() {
   const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(backendCallback)}&response_type=code&scope=${encodeURIComponent(scope)}`;
   window.location.href = oauthUrl;
 }
 
-// ---------- 更新 UI ----------
+//更新 UI
 function updateUserUI() {
   const usernameSpan = document.getElementById("username");
   if (usernameSpan) usernameSpan.textContent = username;
@@ -26,7 +26,7 @@ function updateUserUI() {
   if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 }
 
-// ---------- 渲染賽事 ----------
+//渲染賽事
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
@@ -68,7 +68,7 @@ function renderEvents() {
   });
 }
 
-// ---------- 前往隊長報名 ----------
+//前往隊長報名
 function goSignup() {
   if(!isLoggedIn){
     alert("請先登入 Discord");
@@ -77,7 +77,7 @@ function goSignup() {
   alert("前往隊長報名頁");
 }
 
-// ---------- 初始化 ----------
+//初始化
 document.addEventListener("DOMContentLoaded", () => {
   renderEvents();
   updateUserUI();
