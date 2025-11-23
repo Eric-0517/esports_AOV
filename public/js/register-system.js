@@ -1,4 +1,4 @@
-//全域變數
+// 全域變數
 let isLoggedIn = false;
 let username = "訪客";
 let token = null;
@@ -8,7 +8,7 @@ const clientId = "1403970810762363013";
 const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
 const scope = "identify";
 
-//Modal 工具
+// Modal 工具
 function showModal(title, text) {
   const modal = document.getElementById("system-modal");
   const modalText = document.getElementById("modal-text");
@@ -27,7 +27,7 @@ function showModal(title, text) {
   });
 }
 
-//讀取 URL Token
+// 讀取 URL Token
 function readTokenFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const t = urlParams.get("token");
@@ -37,25 +37,36 @@ function readTokenFromURL() {
   }
 }
 
-//載入使用者
-function loadUserFromToken() {
+// 從後端驗證 token
+async function loadUserFromToken() {
   const saved = localStorage.getItem("userToken");
   if (!saved) return;
 
   try {
-    const user = JSON.parse(atob(saved)); // Base64 解碼
-    username = user.username || "訪客";
+    const res = await fetch("https://esportsmoba.dpdns.org/auth/me", {
+      headers: { "Authorization": `Bearer ${saved}` }
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      throw new Error("Token 過期或無效");
+    }
+
+    // 正確讀取後端回傳的使用者名稱
+    username = data.username;
     isLoggedIn = true;
+
   } catch (err) {
-    console.error("Token 解析失敗：", err);
-    showModal("系統通知", "登入失敗或已過期，請重新登入");
+    console.error("Token 驗證失敗：", err);
+    showModal("系統通知", "登入已過期，請重新登入");
     isLoggedIn = false;
     username = "訪客";
     localStorage.removeItem("userToken");
   }
 }
 
-//OAuth 登入
+// OAuth 登入
 function login() {
   const oauthUrl =
     `https://discord.com/oauth2/authorize?client_id=${clientId}` +
@@ -64,7 +75,7 @@ function login() {
   window.location.href = oauthUrl;
 }
 
-//更新 UI
+// UI 更新
 function updateUserUI() {
   const usernameSpan = document.getElementById("username");
   if (usernameSpan) usernameSpan.textContent = username;
@@ -76,7 +87,7 @@ function updateUserUI() {
   if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 }
 
-//渲染賽事
+// 渲染賽事
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
@@ -118,7 +129,7 @@ function renderEvents() {
   });
 }
 
-//前往隊長報名
+// 前往隊長報名
 function goSignup() {
   if (!isLoggedIn) {
     showModal("系統通知", "請先登入");
@@ -127,10 +138,10 @@ function goSignup() {
   alert("前往隊長報名頁");
 }
 
-//初始化
+// 初始化
 document.addEventListener("DOMContentLoaded", async () => {
   readTokenFromURL();
-  loadUserFromToken();
+  await loadUserFromToken(); // ⬅ 重要：變成 async 等待驗證完成
   updateUserUI();
   renderEvents();
 
