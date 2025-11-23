@@ -1,4 +1,3 @@
-<style>
 body {
   background: #000;
   color: #fff;
@@ -135,8 +134,7 @@ body {
   margin-bottom: 20px;
 }
 
-/* 確認按鈕：只有紅色邊框 */
-#modal-confirm {
+.modal-btn {
   background: transparent;
   border: 2px solid #E82D6A;
   color: #E82D6A;
@@ -148,7 +146,6 @@ body {
 .hidden {
   display: none;
 }
-
 .player-section {
   padding: 20px;
 }
@@ -190,4 +187,3 @@ body {
   margin-bottom: 10px;
   border-radius: 4px;
 }
-</style>
