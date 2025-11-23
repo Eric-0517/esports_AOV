@@ -8,7 +8,26 @@ const clientId = "1403970810762363013";
 const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
 const scope = "identify";
 
-// 讀取 URL 上的 token（後端登入成功會帶回來）
+//Modal 工具
+function showModal(title, text) {
+  const modal = document.getElementById("system-modal");
+  const modalText = document.getElementById("modal-text");
+  const modalTitle = modal.querySelector(".modal-title");
+  const modalBtn = document.getElementById("modal-confirm");
+
+  modalTitle.textContent = title;
+  modalText.textContent = text;
+  modal.classList.remove("hidden");
+
+  return new Promise(resolve => {
+    modalBtn.onclick = () => {
+      modal.classList.add("hidden");
+      resolve(true);
+    };
+  });
+}
+
+//讀取 URL Token
 function readTokenFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   const t = urlParams.get("token");
@@ -18,21 +37,25 @@ function readTokenFromURL() {
   }
 }
 
-// 從 localStorage 讀取使用者資料
+//載入使用者
 function loadUserFromToken() {
   const saved = localStorage.getItem("userToken");
   if (!saved) return;
 
   try {
-    const user = JSON.parse(atob(saved));  // 解碼 Base64
+    const user = JSON.parse(atob(saved)); // Base64 解碼
     username = user.username || "訪客";
     isLoggedIn = true;
   } catch (err) {
     console.error("Token 解析失敗：", err);
+    showModal("系統通知", "登入失敗或已過期，請重新登入");
+    isLoggedIn = false;
+    username = "訪客";
+    localStorage.removeItem("userToken");
   }
 }
 
-// OAuth 登入
+//OAuth 登入
 function login() {
   const oauthUrl =
     `https://discord.com/oauth2/authorize?client_id=${clientId}` +
@@ -41,7 +64,7 @@ function login() {
   window.location.href = oauthUrl;
 }
 
-// 更新 UI
+//更新 UI
 function updateUserUI() {
   const usernameSpan = document.getElementById("username");
   if (usernameSpan) usernameSpan.textContent = username;
@@ -53,7 +76,7 @@ function updateUserUI() {
   if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 }
 
-// 渲染賽事
+//渲染賽事
 function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
@@ -95,21 +118,20 @@ function renderEvents() {
   });
 }
 
-// 前往隊長報名
+//前往隊長報名
 function goSignup() {
   if (!isLoggedIn) {
-    alert("請先登入 Discord");
+    showModal("系統通知", "請先登入");
     return;
   }
   alert("前往隊長報名頁");
 }
 
-// 初始化
-document.addEventListener("DOMContentLoaded", () => {
-
-  readTokenFromURL();   // ★ 讀取 URL 返回的 token
-  loadUserFromToken();  // ★ 載入 localStorage 儲存的 token
-  updateUserUI();       // ★ 更新頁面使用者名稱
+//初始化
+document.addEventListener("DOMContentLoaded", async () => {
+  readTokenFromURL();
+  loadUserFromToken();
+  updateUserUI();
   renderEvents();
 
   const loginBtn = document.getElementById("login-btn");
