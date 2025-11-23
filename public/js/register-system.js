@@ -1,192 +1,58 @@
-<script>
 // ---------- 全域變數 ----------
 let isLoggedIn = false;
 let username = "訪客";
-let savedProfile = {};
 let token = null;
-
-const usernameEl = document.getElementById("username");
-const navRight = document.getElementById("nav-right");
-const modal = document.getElementById("system-modal");
-const modalText = document.getElementById("modal-text");
-const modalConfirm = document.getElementById("modal-confirm");
 
 // Discord OAuth 設定
 const clientId = "1403970810762363013";
 const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
 const scope = "identify";
 
-// ---------- 初始化 ----------
-document.addEventListener("DOMContentLoaded", async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  token = urlParams.get("token");
-
-  if (token) {
-    localStorage.setItem("auth_token", token);
-    handleToken(token);
-    history.replaceState(null, "", "register-system.html");
-  } else {
-    token = localStorage.getItem("auth_token");
-    if (token) handleToken(token);
-  }
-
-  await loadProfile();
-  updateUserUI();
-  await renderEvents();
-
-  // 綁定按鈕事件
-  document.getElementById("save-profile")?.addEventListener("click", saveProfile);
-  document.getElementById("cancel-profile")?.addEventListener("click", goEventHome);
-  document.getElementById("cancel-leader")?.addEventListener("click", goEventHome);
-  document.getElementById("next-leader")?.addEventListener("click", () => switchPage("member-page"));
-  document.getElementById("cancel-member")?.addEventListener("click", goEventHome);
-  document.getElementById("confirm-member")?.addEventListener("click", () => { 
-    alert("報名完成"); 
-    goEventHome(); 
-  });
-
-  // 綁定 HTML 上的 Discord 登入按鈕
-  const loginBtn = document.getElementById("login-btn");
-  if (loginBtn) loginBtn.addEventListener("click", login);
-
-  startIdleTimer();
-});
-
-// ---------- 更新 UI ----------
-function updateUserUI() {
-  usernameEl.textContent = username;
-
-  const leaderDiscord = document.getElementById("leader-discord");
-  if (leaderDiscord) leaderDiscord.textContent = username;
-
-  const loginBtn = document.getElementById("login-btn");
-  if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
-
-  // 已登入顯示個人資料 / 登出
-  if (isLoggedIn) {
-    if (!document.getElementById("profile-btn")) {
-      const profileBtn = document.createElement("button");
-      profileBtn.id = "profile-btn";
-      profileBtn.className = "btn-login";
-      profileBtn.textContent = "個人資料 / 已報名資訊";
-      profileBtn.addEventListener("click", goProfile);
-      navRight.appendChild(profileBtn);
-
-      const logoutBtn = document.createElement("button");
-      logoutBtn.id = "logout-btn";
-      logoutBtn.className = "btn-login";
-      logoutBtn.textContent = "登出";
-      logoutBtn.addEventListener("click", logout);
-      navRight.appendChild(logoutBtn);
-    }
-  } else {
-    const profileBtn = document.getElementById("profile-btn");
-    const logoutBtn = document.getElementById("logout-btn");
-    if (profileBtn) profileBtn.remove();
-    if (logoutBtn) logoutBtn.remove();
-  }
-
-  const discordSpan = document.getElementById("p-discord");
-  if (discordSpan) discordSpan.textContent = username;
-
-  const fields = ["realname", "phone", "email", "birthday", "taiwan", "idNumber"];
-  fields.forEach(f => {
-    const el = document.getElementById(`p-${f}`);
-    if (el) el.value = savedProfile[f] || "";
-  });
-
-  const nicknameInput = document.getElementById("p-nickname");
-  const rankInput = document.getElementById("p-rank");
-  if (savedProfile.nickname) {
-    nicknameInput.value = savedProfile.nickname;
-    nicknameInput.disabled = true;
-  }
-  if (savedProfile.rank) {
-    rankInput.value = savedProfile.rank;
-    rankInput.disabled = true;
-  }
-}
-
-// ---------- Discord 登入 ----------
+// ---------- OAuth 登入 ----------
 function login() {
-  const oauthUrl =
-    `https://discord.com/oauth2/authorize` +
-    `?client_id=${clientId}` +
-    `&redirect_uri=${encodeURIComponent(backendCallback)}` +
-    `&response_type=code` +
-    `&scope=${encodeURIComponent(scope)}`;
+  const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(backendCallback)}&response_type=code&scope=${encodeURIComponent(scope)}`;
   window.location.href = oauthUrl;
 }
 
-// ---------- 登出 ----------
-function logout() {
-  isLoggedIn = false;
-  username = "訪客";
-  savedProfile = {};
-  localStorage.removeItem("auth_token");
-  switchPage("event-home");
-  updateUserUI();
-  clearTimeout(idleTimer);
+// ---------- 更新 UI ----------
+function updateUserUI() {
+  const usernameSpan = document.getElementById("username");
+  if (usernameSpan) usernameSpan.textContent = username;
+
+  const leader = document.getElementById("leader-discord");
+  if (leader) leader.textContent = username;
+
+  const loginBtn = document.getElementById("login-btn");
+  if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 }
 
-// ---------- JWT ----------
-function handleToken(t) {
-  try {
-    const payload = JSON.parse(atob(t.split('.')[1]));
-    username = payload.username || "Discord使用者";
-    isLoggedIn = true;
-  } catch (err) {
-    console.error("JWT 解析錯誤:", err);
-  }
-}
-
-// ---------- 頁面切換 ----------
-function switchPage(pageId) {
-  ["event-home", "profile-page", "leader-page", "member-page"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-  const showEl = document.getElementById(pageId);
-  if (showEl) showEl.style.display = "block";
-}
-
-// ---------- Modal ----------
-function showModal(msg) {
-  modalText.textContent = msg;
-  modal.classList.remove("hidden");
-}
-modalConfirm.addEventListener("click", () => modal.classList.add("hidden"));
-
-// ---------- Render Events ----------
-async function renderEvents() {
+// ---------- 渲染賽事 ----------
+function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
+  if (!list) return;
+
   list.innerHTML = "";
 
-  let events = [];
-  try {
-    const res = await fetch("/events.json");
-    if (!res.ok) throw new Error("JSON 讀取失敗");
-    events = await res.json();
-  } catch (err) {
-    console.error(err);
-    noEvent.classList.remove("hidden");
-    return;
-  }
+  const events = [
+    { name: "AOV 線上賽 - 測試賽事", date:"2025/11/30", signup:"2025/11/20 - 2025/11/25", status:"報名中", hasSchedule:true },
+    { name: "AOV 線上賽 - 測試賽事2", date:"2025/12/05", signup:"2025/11/25 - 2025/11/30", status:"報名結束", hasSchedule:false }
+  ];
 
-  if (!events || events.length === 0) {
-    noEvent.classList.remove("hidden");
+  if(events.length === 0){
+    if(noEvent) noEvent.classList.remove("hidden");
     return;
   } else {
-    noEvent.classList.add("hidden");
+    if(noEvent) noEvent.classList.add("hidden");
   }
 
   events.forEach(ev => {
     const div = document.createElement("div");
     div.className = "event-card";
 
-    const btnSignupClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
-    const btnScheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
+    const btnClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
+    const btnText = ev.status === "報名中" ? "前往報名" : "報名結束";
+    const scheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
 
     div.innerHTML = `
       <div class="event-name">${ev.name}</div>
@@ -194,90 +60,31 @@ async function renderEvents() {
       <div class="event-info">報名時間：${ev.signup}</div>
       <div class="event-info">狀態：${ev.status}</div>
       <div class="card-btn-row">
-        <div class="card-btn ${btnSignupClass}">前往報名</div>
-        <div class="card-btn ${btnScheduleClass}">賽程表</div>
+        <div class="card-btn ${btnClass}" ${ev.status==="報名中"?'onclick="goSignup()"':''}>${btnText}</div>
+        <div class="card-btn ${scheduleClass}" ${ev.hasSchedule?'onclick="window.open(\'/schedule\',\'_blank\')"':''}>賽程表</div>
       </div>
     `;
-
-    // 已修正 selector，不會再報錯
-    const signupBtn = div.querySelector(".card-btn-row .card-btn:nth-child(1)");
-    const scheduleBtn = div.querySelector(".card-btn-row .card-btn:nth-child(2)");
-
-    if (signupBtn && ev.status === "報名中") {
-      signupBtn.addEventListener("click", () => goSignup("team"));
-    }
-
-    if (scheduleBtn && ev.hasSchedule) {
-      scheduleBtn.addEventListener("click", () => window.open(`/schedule/${ev.id}`, "_blank"));
-    }
-
     list.appendChild(div);
   });
 }
 
-// ---------- 報名 ----------
-function goSignup(type) {
-  if (!isLoggedIn) { showModal("請先登入 Discord"); return; }
-  type === "team" ? switchPage("leader-page") : switchPage("member-page");
-}
-
-function goProfile() {
-  if (!isLoggedIn) { showModal("請先登入 Discord"); return; }
-  switchPage("profile-page");
-}
-
-function goEventHome() { switchPage("event-home"); }
-
-// ---------- 個人資料 ----------
-async function loadProfile() {
-  if (!token) return;
-  try {
-    const res = await fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } });
-    if (res.ok) { savedProfile = await res.json(); updateUserUI(); }
-  } catch (err) { console.error(err); }
-}
-
-async function saveProfile() {
-  const data = {
-    nickname: document.getElementById("p-nickname").value,
-    rank: document.getElementById("p-rank").value,
-    realname: document.getElementById("p-realname").value,
-    phone: document.getElementById("p-phone").value,
-    email: document.getElementById("p-email").value,
-    birthday: document.getElementById("p-birthday").value,
-    taiwan: document.getElementById("p-taiwan").value,
-    idNumber: document.getElementById("p-id").value
-  };
-  if (!token) { showModal("請先登入 Discord"); return; }
-
-  try {
-    const res = await fetch("/api/profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data)
-    });
-    if (res.ok) {
-      savedProfile = await res.json();
-      alert("個人資料已儲存");
-      updateUserUI();
-      goEventHome();
-    } else alert("儲存失敗");
-  } catch (err) {
-    console.error(err);
-    alert("儲存失敗");
+// ---------- 前往隊長報名 ----------
+function goSignup() {
+  if(!isLoggedIn){
+    alert("請先登入 Discord");
+    return;
   }
+  alert("前往隊長報名頁");
 }
 
-// ---------- 自動登出 ----------
-let idleTimer = null;
-const MAX_IDLE_TIME = 5 * 60 * 1000;
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  if (!isLoggedIn) return;
-  idleTimer = setTimeout(() => { showModal("登入失敗或已過期，請重新登入"); logout(); }, MAX_IDLE_TIME);
-}
-function startIdleTimer() {
-  ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => document.addEventListener(evt, resetIdleTimer));
-  resetIdleTimer();
-}
-</script>
+// ---------- 初始化 ----------
+document.addEventListener("DOMContentLoaded", () => {
+  renderEvents();
+  updateUserUI();
+
+  // 綁定登入按鈕
+  const loginBtn = document.getElementById("login-btn");
+  if(loginBtn){
+    loginBtn.addEventListener("click", login);
+  }
+});
