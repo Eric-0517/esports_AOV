@@ -86,6 +86,15 @@ function updateUserUI() {
   if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
 }
 
+// 前往隊長報名（或顯示未登入提示）
+function goSignup(url) {
+  if (!isLoggedIn) {
+    showModal("系統通知", "請先登入");
+    return;
+  }
+  window.location.href = url;
+}
+
 // 渲染賽事
 async function renderEvents() {
   const list = document.getElementById("event-list");
@@ -95,7 +104,6 @@ async function renderEvents() {
   list.innerHTML = "";
 
   try {
-    // 加亂數避免快取
     const res = await fetch(`/events.json?ts=${Date.now()}`);
     if (!res.ok) throw new Error("讀取 events.json 失敗");
     const events = await res.json();
@@ -121,7 +129,7 @@ async function renderEvents() {
         <div class="event-info">報名時間：${ev.signup}</div>
         <div class="event-info">狀態：${ev.status}</div>
         <div class="card-btn-row">
-          <div class="card-btn ${btnClass}" ${ev.status==="報名中" ? `onclick="window.location.href='${ev.signupUrl}'"` : ""}>${btnText}</div>
+          <div class="card-btn ${btnClass}" ${ev.status==="報名中" ? `onclick="goSignup('${ev.signupUrl}')"` : ""}>${btnText}</div>
           <div class="card-btn ${scheduleClass}" ${ev.hasSchedule ? `onclick="window.open('/schedule','_blank')"` : ""}>賽程表</div>
         </div>
       `;
@@ -134,19 +142,10 @@ async function renderEvents() {
   }
 }
 
-// 前往隊長報名
-function goSignup() {
-  if (!isLoggedIn) {
-    showModal("系統通知", "請先登入");
-    return;
-  }
-  alert("前往隊長報名頁");
-}
-
 // 初始化
 document.addEventListener("DOMContentLoaded", async () => {
   readTokenFromURL();
-  await loadUserFromToken(); // 等待驗證完成
+  await loadUserFromToken();
   updateUserUI();
   renderEvents();
 
