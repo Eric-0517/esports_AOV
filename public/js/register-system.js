@@ -88,45 +88,51 @@ function updateUserUI() {
 }
 
 // 渲染賽事
-function renderEvents() {
+async function renderEvents() {
   const list = document.getElementById("event-list");
   const noEvent = document.getElementById("no-event");
   if (!list) return;
 
   list.innerHTML = "";
 
-  const events = [
-    { name: "AOV 線上賽 - 測試賽事", date:"2025/11/30", signup:"2025/11/20 - 2025/11/25", status:"報名中", hasSchedule:true },
-    { name: "AOV 線上賽 - 測試賽事2", date:"2025/12/05", signup:"2025/11/25 - 2025/11/30", status:"報名結束", hasSchedule:false }
-  ];
+  try {
+    // 讀取 events.json
+    const res = await fetch("/events.json");
+    if (!res.ok) throw new Error("讀取 events.json 失敗");
+    const events = await res.json();
 
-  if (events.length === 0) {
+    if (!events || events.length === 0) {
+      noEvent.classList.remove("hidden");
+      return;
+    } else {
+      noEvent.classList.add("hidden");
+    }
+
+    events.forEach(ev => {
+      const div = document.createElement("div");
+      div.className = "event-card";
+
+      const btnClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
+      const btnText = ev.status === "報名中" ? "前往報名" : "報名結束";
+      const scheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
+
+      div.innerHTML = `
+        <div class="event-name">${ev.name}</div>
+        <div class="event-info">比賽日期：${ev.date}</div>
+        <div class="event-info">報名時間：${ev.signup}</div>
+        <div class="event-info">狀態：${ev.status}</div>
+        <div class="card-btn-row">
+          <div class="card-btn ${btnClass}" ${ev.status==="報名中" ? `onclick="window.location.href='${ev.signupUrl}'"` : ""}>${btnText}</div>
+          <div class="card-btn ${scheduleClass}" ${ev.hasSchedule ? `onclick="window.open('/schedule','_blank')"` : ""}>賽程表</div>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("載入賽事失敗:", err);
     if (noEvent) noEvent.classList.remove("hidden");
-    return;
-  } else {
-    if (noEvent) noEvent.classList.add("hidden");
   }
-
-  events.forEach(ev => {
-    const div = document.createElement("div");
-    div.className = "event-card";
-
-    const btnClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
-    const btnText = ev.status === "報名中" ? "前往報名" : "報名結束";
-    const scheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
-
-    div.innerHTML = `
-      <div class="event-name">${ev.name}</div>
-      <div class="event-info">比賽日期：${ev.date}</div>
-      <div class="event-info">報名時間：${ev.signup}</div>
-      <div class="event-info">狀態：${ev.status}</div>
-      <div class="card-btn-row">
-        <div class="card-btn ${btnClass}" ${ev.status==="報名中" ? 'onclick="goSignup()"' : ""}>${btnText}</div>
-        <div class="card-btn ${scheduleClass}" ${ev.hasSchedule ? 'onclick="window.open(\'/schedule\',\'_blank\')"' : ""}>賽程表</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
 }
 
 // 前往隊長報名
