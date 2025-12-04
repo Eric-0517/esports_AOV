@@ -1,10 +1,20 @@
 [
   {
     "id": 1,
-    "name": "AOV 線上賽 - 測試賽事",
-    "date": "2025/11/30",
+    "name": "測試賽事 - 個人報名",
+    "date": "2026/11/30",
     "signup": "2025/11/20 - 2025/11/25",
     "status": "報名中",
-    "hasSchedule": true
+    "hasSchedule": true,
+    "signupUrl": "/signup/01"
+  },
+  {
+    "id": 2,
+    "name": "測試賽事 - 團體報名",
+    "date": "2026/12/05",
+    "signup": "2025/11/25 - 2025/11/30",
+    "status": "報名結束",
+    "hasSchedule": true,
+    "signupUrl": "/signup/02"
   }
 ]
