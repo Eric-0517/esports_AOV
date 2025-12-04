@@ -13,7 +13,7 @@
     "name": "測試賽事 - 團體報名",
     "date": "2026/12/05",
     "signup": "2025/11/25 - 2025/11/30",
-    "status": "報名結束",
+    "status": "報名中",
     "hasSchedule": true,
     "signupUrl": "/signup/02"
   }
