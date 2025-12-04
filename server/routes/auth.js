@@ -2,7 +2,7 @@
 const express = require("express");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // 你需要建立 User model
+const User = require("../models/User");
 const router = express.Router();
 
 // Discord OAuth callback
@@ -11,7 +11,7 @@ router.get("/discord/callback", async (req, res) => {
   if (!code) return res.status(400).send("No code in query");
 
   try {
-    const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback"; // 與 Discord App 設定一致
+    const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback";
 
     const data = new URLSearchParams({
       client_id: process.env.DISCORD_CLIENT_ID,
@@ -22,6 +22,8 @@ router.get("/discord/callback", async (req, res) => {
       scope: "identify",
     });
 
+    console.log("Exchanging code for token...");
+
     // 交換 access token
     const tokenRes = await axios.post(
       "https://discord.com/api/oauth2/token",
@@ -29,16 +31,27 @@ router.get("/discord/callback", async (req, res) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    const access_token = tokenRes.data.access_token;
+    if (!tokenRes.data || !tokenRes.data.access_token) {
+      console.error("Token response error:", tokenRes.data);
+      return res.redirect("/login.html?error=token_invalid");
+    }
 
-    // 取得 Discord 使用者資料
+    const access_token = tokenRes.data.access_token;
+    console.log("Access Token:", access_token);
+
+    // 取得使用者資料
     const userRes = await axios.get("https://discord.com/api/users/@me", {
       headers: { Authorization: `Bearer ${access_token}` },
     });
 
     const u = userRes.data;
 
-    // 建立或更新使用者資料
+    if (!u || !u.id) {
+      console.error("User info error:", userRes.data);
+      return res.redirect("/login.html?error=userinfo_invalid");
+    }
+
+    // 建立或更新
     const user = await User.findOneAndUpdate(
       { discordId: u.id },
       {
@@ -61,11 +74,16 @@ router.get("/discord/callback", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // 導回前端並帶上 token
-    res.redirect(`https://esportsmoba.dpdns.org/register-system.html?token=${token}`);
+    console.log("Generated JWT:", token);
+
+    // 導回前端
+    return res.redirect(
+      `https://esportsmoba.dpdns.org/register-system.html?token=${token}`
+    );
+
   } catch (err) {
     console.error("Discord OAuth error:", err.response?.data || err.message || err);
-    res.status(500).send("Discord OAuth error");
+    return res.redirect("/login.html?error=oauth_failed");
   }
 });
 
