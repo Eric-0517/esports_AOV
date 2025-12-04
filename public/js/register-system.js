@@ -1,150 +1,98 @@
-// 全域變數
-let isLoggedIn = false;
-let username = "訪客";
-let token = null;
+const express = require("express");
+const axios = require("axios");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const router = express.Router();
 
-// Discord OAuth 設定
-const clientId = "1403970810762363013";
-const backendCallback = "https://esportsmoba.dpdns.org/auth/discord/callback";
-const scope = "identify";
+// 解析 JWT 中間件
+function authMiddleware(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header) return res.status(401).json({ ok: false, msg: "No token" });
 
-// Modal 工具
-function showModal(title, text) {
-  const modal = document.getElementById("system-modal");
-  const modalText = document.getElementById("modal-text");
-  const modalTitle = modal.querySelector(".modal-title");
-  const modalBtn = document.getElementById("modal-confirm");
-
-  modalTitle.textContent = title;
-  modalText.textContent = text;
-  modal.classList.remove("hidden");
-
-  return new Promise(resolve => {
-    modalBtn.onclick = () => {
-      modal.classList.add("hidden");
-      resolve(true);
-    };
-  });
-}
-
-// 讀取 URL Token
-function readTokenFromURL() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const t = urlParams.get("token");
-  if (t) {
-    localStorage.setItem("userToken", t);
-    window.history.replaceState({}, document.title, window.location.pathname);
+  const token = header.split(" ")[1];
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(401).json({ ok: false, msg: "Invalid token" });
   }
 }
 
-// 從後端驗證 token
-async function loadUserFromToken() {
-  const saved = localStorage.getItem("userToken");
-  if (!saved) return;
+// OAuth callback
+router.get("/discord/callback", async (req, res) => {
+  const code = req.query.code;
+  if (!code) return res.status(400).send("No code in query");
 
   try {
-    const res = await fetch("https://esportsmoba.dpdns.org/auth/me", {
-      headers: { "Authorization": `Bearer ${saved}` }
+    const redirectUri = "https://esportsmoba.dpdns.org/auth/discord/callback";
+
+    const data = new URLSearchParams({
+      client_id: process.env.DISCORD_CLIENT_ID,
+      client_secret: process.env.DISCORD_CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: redirectUri,
+      scope: "identify",
     });
 
-    const data = await res.json();
+    const tokenRes = await axios.post(
+      "https://discord.com/api/oauth2/token",
+      data.toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
 
-    if (!data.ok) {
-      throw new Error("Token 過期或無效");
-    }
+    const access_token = tokenRes.data.access_token;
 
-    // 正確讀取後端回傳的使用者名稱
-    username = data.username;
-    isLoggedIn = true;
+    const userRes = await axios.get("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
 
+    const u = userRes.data;
+
+    const user = await User.findOneAndUpdate(
+      { discordId: u.id },
+      {
+        discordId: u.id,
+        username: u.username,
+        discriminator: u.discriminator,
+        avatar: u.avatar,
+      },
+      { upsert: true, new: true }
+    );
+
+    const jwtToken = jwt.sign(
+      {
+        sub: user.discordId,
+        username: user.username,
+        role: user.role || "user",
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.redirect(
+      `https://esportsmoba.dpdns.org/register-system.html?token=${jwtToken}`
+    );
   } catch (err) {
-    console.error("Token 驗證失敗：", err);
-    showModal("系統通知", "登入已過期，請重新登入");
-    isLoggedIn = false;
-    username = "訪客";
-    localStorage.removeItem("userToken");
+    console.error("OAuth Error:", err.response?.data || err);
+    res.status(500).send("Discord OAuth error");
   }
-}
-
-// OAuth 登入
-function login() {
-  const oauthUrl =
-    `https://discord.com/oauth2/authorize?client_id=${clientId}` +
-    `&redirect_uri=${encodeURIComponent(backendCallback)}` +
-    `&response_type=code&scope=${encodeURIComponent(scope)}`;
-  window.location.href = oauthUrl;
-}
-
-// UI 更新
-function updateUserUI() {
-  const usernameSpan = document.getElementById("username");
-  if (usernameSpan) usernameSpan.textContent = username;
-
-  const leader = document.getElementById("leader-discord");
-  if (leader) leader.textContent = username;
-
-  const loginBtn = document.getElementById("login-btn");
-  if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
-}
-
-// 渲染賽事
-function renderEvents() {
-  const list = document.getElementById("event-list");
-  const noEvent = document.getElementById("no-event");
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  const events = [
-    { name: "AOV 線上賽 - 測試賽事", date:"2025/11/30", signup:"2025/11/20 - 2025/11/25", status:"報名中", hasSchedule:true },
-    { name: "AOV 線上賽 - 測試賽事2", date:"2025/12/05", signup:"2025/11/25 - 2025/11/30", status:"報名結束", hasSchedule:false }
-  ];
-
-  if (events.length === 0) {
-    if (noEvent) noEvent.classList.remove("hidden");
-    return;
-  } else {
-    if (noEvent) noEvent.classList.add("hidden");
-  }
-
-  events.forEach(ev => {
-    const div = document.createElement("div");
-    div.className = "event-card";
-
-    const btnClass = ev.status === "報名中" ? "btn-active" : "btn-disabled";
-    const btnText = ev.status === "報名中" ? "前往報名" : "報名結束";
-    const scheduleClass = ev.hasSchedule ? "btn-active" : "btn-disabled";
-
-    div.innerHTML = `
-      <div class="event-name">${ev.name}</div>
-      <div class="event-info">比賽日期：${ev.date}</div>
-      <div class="event-info">報名時間：${ev.signup}</div>
-      <div class="event-info">狀態：${ev.status}</div>
-      <div class="card-btn-row">
-        <div class="card-btn ${btnClass}" ${ev.status==="報名中" ? 'onclick="goSignup()"' : ""}>${btnText}</div>
-        <div class="card-btn ${scheduleClass}" ${ev.hasSchedule ? 'onclick="window.open(\'/schedule\',\'_blank\')"' : ""}>賽程表</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// 前往隊長報名
-function goSignup() {
-  if (!isLoggedIn) {
-    showModal("系統通知", "請先登入");
-    return;
-  }
-  alert("前往隊長報名頁");
-}
-
-// 初始化
-document.addEventListener("DOMContentLoaded", async () => {
-  readTokenFromURL();
-  await loadUserFromToken(); // ⬅ 重要：變成 async 等待驗證完成
-  updateUserUI();
-  renderEvents();
-
-  const loginBtn = document.getElementById("login-btn");
-  if (loginBtn) loginBtn.addEventListener("click", login);
 });
+
+//提供前端檢查登入狀態用
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findOne({ discordId: req.user.sub });
+    if (!user) return res.json({ ok: false });
+
+    return res.json({
+      ok: true,
+      username: user.username,
+      discordId: user.discordId
+    });
+  } catch {
+    return res.json({ ok: false });
+  }
+});
+
+module.exports = router;
