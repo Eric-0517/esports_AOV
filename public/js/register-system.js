@@ -43,7 +43,7 @@ async function loadUserFromToken() {
   if (!saved) return;
 
   try {
-    const res = await fetch("https://esportsmoba.dpdns.org/auth/me", {
+    const res = await fetch(`https://esportsmoba.dpdns.org/auth/me?ts=${Date.now()}`, {
       headers: { "Authorization": `Bearer ${saved}` }
     });
 
@@ -53,7 +53,6 @@ async function loadUserFromToken() {
       throw new Error("Token 過期或無效");
     }
 
-    // 正確讀取後端回傳的使用者名稱
     username = data.username;
     isLoggedIn = true;
 
@@ -96,8 +95,8 @@ async function renderEvents() {
   list.innerHTML = "";
 
   try {
-    // 讀取 events.json
-    const res = await fetch("/events.json");
+    // 加亂數避免快取
+    const res = await fetch(`/events.json?ts=${Date.now()}`);
     if (!res.ok) throw new Error("讀取 events.json 失敗");
     const events = await res.json();
 
@@ -147,7 +146,7 @@ function goSignup() {
 // 初始化
 document.addEventListener("DOMContentLoaded", async () => {
   readTokenFromURL();
-  await loadUserFromToken(); // ⬅ 重要：變成 async 等待驗證完成
+  await loadUserFromToken(); // 等待驗證完成
   updateUserUI();
   renderEvents();
 
