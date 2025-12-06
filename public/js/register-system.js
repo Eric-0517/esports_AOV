@@ -83,7 +83,15 @@ function updateUserUI() {
   if (leader) leader.textContent = username;
 
   const loginBtn = document.getElementById("login-btn");
-  if (loginBtn) loginBtn.style.display = isLoggedIn ? "none" : "inline-block";
+  const profileBtn = document.getElementById("profile-btn"); // 個人資料按鈕
+
+  if (isLoggedIn) {
+    if (loginBtn) loginBtn.style.display = "none";
+    if (profileBtn) profileBtn.style.display = "inline-block";
+  } else {
+    if (loginBtn) loginBtn.style.display = "inline-block";
+    if (profileBtn) profileBtn.style.display = "none";
+  }
 }
 
 // 前往隊長報名（或顯示未登入提示）
